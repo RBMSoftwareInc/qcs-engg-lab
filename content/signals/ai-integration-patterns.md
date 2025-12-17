@@ -1,0 +1,35 @@
+---
+title: AI Integration Patterns
+order: 4
+description: Architectural patterns for integrating intelligence into existing systems.
+category: case-study
+icon: intelligence
+image: https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=800&q=80
+---
+
+## The Integration Challenge
+
+Adding AI to existing systems is often done poorly. Intelligence is bolted on, creating complexity and technical debt.
+
+## Integration Patterns
+
+We use proven patterns for integrating AI:
+
+- **Intelligence as Service**: AI capabilities exposed as services, not embedded
+- **Event-Driven Intelligence**: AI triggered by events, not polling
+- **Gradual Integration**: Incremental enhancement, not big-bang replacement
+
+## Architecture Benefits
+
+- **Maintainability**: AI components isolated and replaceable
+- **Scalability**: Intelligence scales independently
+- **Testability**: AI components testable in isolation
+
+## Real-World Application
+
+These patterns have been applied in production systems, handling millions of requests while maintaining system reliability and performance.
+
+## Lessons Learned
+
+AI integration is an architectural concern, not a feature concern. Design systems where intelligence enhances, not complicates.
+

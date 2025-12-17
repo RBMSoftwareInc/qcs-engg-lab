@@ -1,0 +1,21 @@
+---
+title: Cloud Architecture
+order: 2
+description: Infrastructure as architecture, not configuration.
+diagram: /assets/images/domains/cloud/diagram.svg
+---
+
+Cloud infrastructure should be architected, not configured. We design systems where infrastructure decisions are architectural decisions.
+
+## Multi-Cloud Foundations
+
+We design for cloud-agnostic architectures that leverage the strengths of multiple providers while maintaining portability and resilience.
+
+## Cost as Architecture
+
+Cost optimization is an architectural concern. We design systems where efficiency is built into the architecture, not optimized after the fact.
+
+## Observability by Design
+
+Observability is not instrumentation added later. It's designed into the system from the ground up, enabling true system understanding.
+

@@ -1,0 +1,25 @@
+<svg width="400" height="300" viewBox="0 0 400 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Cloud architecture layers -->
+  <defs>
+    <style>
+      .layer { stroke: #1F2937; stroke-width: 2; fill: none; opacity: 0.4; }
+      .node { stroke: #1F2937; stroke-width: 2; fill: #FFFDF7; }
+      .connection { stroke: #4B5563; stroke-width: 1; opacity: 0.2; }
+    </style>
+  </defs>
+  
+  <!-- Cloud layers -->
+  <rect x="50" y="50" width="300" height="200" rx="10" class="layer" />
+  <rect x="70" y="70" width="260" height="160" rx="8" class="layer" />
+  <rect x="90" y="90" width="220" height="120" rx="6" class="layer" />
+  
+  <!-- Nodes -->
+  <circle cx="150" cy="130" r="12" class="node" />
+  <circle cx="200" cy="130" r="12" class="node" />
+  <circle cx="250" cy="130" r="12" class="node" />
+  
+  <!-- Connections -->
+  <line x1="150" y1="130" x2="200" y2="130" class="connection" />
+  <line x1="200" y1="130" x2="250" y2="130" class="connection" />
+</svg>
+

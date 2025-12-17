@@ -1,0 +1,29 @@
+---
+title: Cost as an Architectural Concern
+date: 2024-12-10
+order: 2
+description: Why cost optimization should be designed in, not optimized after.
+category: whitepaper
+type: business
+readTime: 7
+image: https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80
+---
+
+Cost is often treated as an operational concern. Something to optimize after the system is built.
+
+## The Post-Optimization Problem
+
+When cost is an afterthought, optimization becomes constraint. We're forced to make trade-offs that compromise architecture.
+
+## Cost by Design
+
+Cost should be an architectural constraint from the beginning. Not a limit to work within, but a design parameter to work with.
+
+## Architectural Cost Decisions
+
+- Data locality reduces network costs
+- Caching strategies reduce compute costs
+- Event-driven architectures reduce coupling costs
+
+Cost is not a budget. It's a design constraint.
+
