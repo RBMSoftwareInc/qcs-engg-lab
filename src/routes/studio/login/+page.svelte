@@ -7,12 +7,15 @@
 	let password = $state('');
 	let error = $state('');
 	let loading = $state(false);
-	let isStaticBuild = $state(false);
+	let isStaticBuild = $state(true); // Start as true to prevent errors
 
 	onMount(async () => {
-		// Check if we're in a static build
-		const apiAvailable = await checkApiAvailable();
-		if (!apiAvailable) {
+		// Check if we're in a static build - but do it safely
+		try {
+			const apiAvailable = await checkApiAvailable();
+			isStaticBuild = !apiAvailable;
+		} catch {
+			// If check fails, assume static build
 			isStaticBuild = true;
 		}
 	});

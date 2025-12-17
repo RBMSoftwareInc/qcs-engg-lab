@@ -29,9 +29,23 @@ export async function safeJsonParse<T = any>(response: Response): Promise<{ data
 
 /**
  * Check if Studio API is available (not a static build)
+ * Uses HEAD request first to avoid any parsing
  */
 export async function checkApiAvailable(): Promise<boolean> {
 	try {
+		// First try HEAD request (no body to parse)
+		const headResponse = await fetch('/studio/api/auth/check', {
+			method: 'HEAD',
+			headers: { 'Accept': 'application/json' }
+		});
+		
+		// Check content-type from HEAD
+		const contentType = headResponse.headers.get('content-type') || '';
+		if (contentType.includes('text/html')) {
+			return false; // Static build
+		}
+		
+		// If HEAD looks good, try actual GET with safe parsing
 		const response = await fetch('/studio/api/auth/check', {
 			method: 'GET',
 			headers: { 'Accept': 'application/json' }
@@ -39,6 +53,7 @@ export async function checkApiAvailable(): Promise<boolean> {
 		const { isHtml } = await safeJsonParse(response);
 		return !isHtml;
 	} catch {
+		// Any error means static build
 		return false;
 	}
 }

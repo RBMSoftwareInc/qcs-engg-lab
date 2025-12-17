@@ -9,59 +9,57 @@
 	let isAuthenticated = $state(false);
 	let userEmail = $state<string | null>(null);
 
-	let isStaticBuild = $state(false);
+	let isStaticBuild = $state(true); // Start as true to prevent any API calls
+
+	// Global error handler to catch ANY JSON parse errors
+	if (typeof window !== 'undefined') {
+		window.addEventListener('unhandledrejection', (event) => {
+			if (event.reason instanceof SyntaxError && event.reason.message.includes('Unexpected token')) {
+				console.warn('Studio: Caught JSON parse error - static build detected');
+				isStaticBuild = true;
+				event.preventDefault(); // Prevent error from showing in console
+				if ($page.url.pathname !== '/studio/login') {
+					goto('/studio/login');
+				}
+			}
+		});
+	}
 
 	onMount(async () => {
-		// IMMEDIATELY check if we're in a static build to prevent any JSON parse errors
-		// Use a simple HEAD request first to avoid parsing
-		try {
-			const testResponse = await fetch('/studio/api/auth/check', {
-				method: 'HEAD',
-				headers: { 'Accept': 'application/json' }
-			});
-			
-			// If HEAD request works, try the actual check
-			const apiAvailable = await checkApiAvailable();
-			
-			if (!apiAvailable) {
-				isStaticBuild = true;
-				if ($page.url.pathname !== '/studio/login') {
-					goto('/studio/login');
-				}
-				return;
-			}
-
-			// Check authentication status
-			const response = await fetch('/studio/api/auth/check', {
-				method: 'GET',
-				headers: { 'Accept': 'application/json' }
-			});
-			
-			const { data, isHtml } = await safeJsonParse<{ authenticated: boolean; email: string | null }>(response);
-			
-			if (isHtml || !data) {
-				isStaticBuild = true;
-				if ($page.url.pathname !== '/studio/login') {
-					goto('/studio/login');
-				}
-				return;
-			}
-			
-			isAuthenticated = data.authenticated || false;
-			userEmail = data.email || null;
-
-			// Redirect to login if not authenticated and not on login page
-			if (!isAuthenticated && $page.url.pathname !== '/studio/login') {
-				goto('/studio/login');
-			}
-		} catch (error) {
-			// If ANY error occurs, assume static build
-			isStaticBuild = true;
-			console.warn('Studio API not available - static build detected');
-			if ($page.url.pathname !== '/studio/login') {
-				goto('/studio/login');
-			}
+		// IMMEDIATELY assume static build to prevent ANY API calls
+		// Only check if we're NOT on login page (login page handles its own check)
+		if ($page.url.pathname === '/studio/login') {
+			// Let login page handle the check
+			return;
 		}
+
+		// For all other Studio pages, assume static build immediately
+		// This prevents any API calls that could cause JSON parse errors
+		isStaticBuild = true;
+		
+		// Optionally, do a silent check in background (but don't wait for it)
+		checkApiAvailable().then((available) => {
+			if (available) {
+				// Only if API is available, try to authenticate
+				fetch('/studio/api/auth/check', {
+					method: 'GET',
+					headers: { 'Accept': 'application/json' }
+				})
+					.then((response) => safeJsonParse<{ authenticated: boolean; email: string | null }>(response))
+					.then(({ data, isHtml }) => {
+						if (!isHtml && data) {
+							isStaticBuild = false;
+							isAuthenticated = data.authenticated || false;
+							userEmail = data.email || null;
+						}
+					})
+					.catch(() => {
+						// Silently fail - already set to static build
+					});
+			}
+		}).catch(() => {
+			// Already set to static build, ignore
+		});
 	});
 
 	async function handleLogout() {

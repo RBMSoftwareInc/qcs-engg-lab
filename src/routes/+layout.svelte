@@ -18,6 +18,18 @@
 	onMount(() => {
 		prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+		// Global error handler for Studio JSON parse errors
+		window.addEventListener('unhandledrejection', (event) => {
+			if (event.reason instanceof SyntaxError && 
+				event.reason.message.includes('Unexpected token') &&
+				event.reason.message.includes('<!doctype')) {
+				// This is a Studio API error on static build
+				console.warn('Studio: Static build detected - API routes not available');
+				event.preventDefault(); // Suppress the error
+				// Don't redirect here - let Studio pages handle it
+			}
+		});
+
 		// Setup keyboard navigation
 		setupKeyboardNavigation();
 
