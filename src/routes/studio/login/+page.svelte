@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
+	import { safeJsonParse, checkApiAvailable } from '$lib/studio/api-utils';
 
 	let email = $state('');
 	let password = $state('');
@@ -10,18 +11,8 @@
 
 	onMount(async () => {
 		// Check if we're in a static build
-		try {
-			const response = await fetch('/studio/api/auth/check', {
-				method: 'GET',
-				headers: { 'Accept': 'application/json' }
-			});
-			const contentType = response.headers.get('content-type') || '';
-			const text = await response.text();
-			
-			if (contentType.includes('text/html') || text.trim().startsWith('<!')) {
-				isStaticBuild = true;
-			}
-		} catch {
+		const apiAvailable = await checkApiAvailable();
+		if (!apiAvailable) {
 			isStaticBuild = true;
 		}
 	});
@@ -44,17 +35,13 @@
 				body: JSON.stringify({ email, password })
 			});
 
-			// Check if response is HTML (API route doesn't exist)
-			const contentType = response.headers.get('content-type') || '';
-			const text = await response.text();
+			const { data, isHtml } = await safeJsonParse<{ success: boolean; message?: string }>(response);
 			
-			if (contentType.includes('text/html') || text.trim().startsWith('<!')) {
+			if (isHtml || !data) {
 				error = 'Studio API not available. Studio requires server-side deployment (Node.js).';
 				loading = false;
 				return;
 			}
-
-			const data = JSON.parse(text);
 
 			if (data.success) {
 				goto('/studio');

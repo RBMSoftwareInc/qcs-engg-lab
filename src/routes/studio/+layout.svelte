@@ -57,12 +57,17 @@
 		}
 	});
 
-	function handleLogout() {
-		fetch('/studio/api/auth/logout', { method: 'POST' })
-			.then(() => {
-				isAuthenticated = false;
-				goto('/studio/login');
-			});
+	async function handleLogout() {
+		try {
+			const response = await fetch('/studio/api/auth/logout', { method: 'POST' });
+			// Don't parse response, just redirect
+			isAuthenticated = false;
+			goto('/studio/login');
+		} catch {
+			// Even if logout fails, redirect to login
+			isAuthenticated = false;
+			goto('/studio/login');
+		}
 	}
 </script>
 
