@@ -3,6 +3,7 @@
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
 	import Logo from '$lib/components/Logo.svelte';
+	import { safeJsonParse, checkApiAvailable } from '$lib/studio/api-utils';
 
 	let { children } = $props();
 	let isAuthenticated = $state(false);
@@ -11,28 +12,27 @@
 	let isStaticBuild = $state(false);
 
 	onMount(async () => {
-		// Check if we're in a static build (no API routes available)
+		// Check if API is available
+		const apiAvailable = await checkApiAvailable();
+		
+		if (!apiAvailable) {
+			isStaticBuild = true;
+			if ($page.url.pathname !== '/studio/login') {
+				goto('/studio/login');
+			}
+			return;
+		}
+
+		// Check authentication status
 		try {
 			const response = await fetch('/studio/api/auth/check', {
 				method: 'GET',
 				headers: { 'Accept': 'application/json' }
 			});
 			
-			// Check if response is HTML (means API route doesn't exist - static build)
-			const contentType = response.headers.get('content-type') || '';
-			if (contentType.includes('text/html')) {
-				isStaticBuild = true;
-				// Redirect to login page which will show the notice
-				if ($page.url.pathname !== '/studio/login') {
-					goto('/studio/login');
-				}
-				return;
-			}
+			const { data, isHtml } = await safeJsonParse<{ authenticated: boolean; email: string | null }>(response);
 			
-			// Try to parse as JSON
-			const text = await response.text();
-			if (text.trim().startsWith('<!')) {
-				// HTML response - static build
+			if (isHtml || !data) {
 				isStaticBuild = true;
 				if ($page.url.pathname !== '/studio/login') {
 					goto('/studio/login');
@@ -40,7 +40,6 @@
 				return;
 			}
 			
-			const data = JSON.parse(text);
 			isAuthenticated = data.authenticated || false;
 			userEmail = data.email || null;
 
@@ -49,7 +48,7 @@
 				goto('/studio/login');
 			}
 		} catch (error) {
-			// If fetch fails or JSON parse fails, we're likely in a static build
+			// If fetch fails, we're likely in a static build
 			isStaticBuild = true;
 			console.warn('Studio API not available - static build detected');
 			if ($page.url.pathname !== '/studio/login') {

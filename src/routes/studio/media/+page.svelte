@@ -1,22 +1,36 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { safeJsonParse, checkApiAvailable } from '$lib/studio/api-utils';
 
 	let files = $state<string[]>([]);
 	let uploading = $state(false);
 	let error = $state('');
 	let success = $state('');
+	let isStaticBuild = $state(false);
 
 	onMount(async () => {
+		const apiAvailable = await checkApiAvailable();
+		if (!apiAvailable) {
+			isStaticBuild = true;
+			return;
+		}
 		await loadMedia();
 	});
 
 	async function loadMedia() {
 		try {
 			const response = await fetch('/studio/api/media');
-			const data = await response.json();
+			const { data, isHtml } = await safeJsonParse<{ files: string[] }>(response);
+			
+			if (isHtml || !data) {
+				isStaticBuild = true;
+				return;
+			}
+			
 			files = data.files || [];
 		} catch (err) {
 			console.error('Failed to load media:', err);
+			isStaticBuild = true;
 		}
 	}
 
@@ -40,7 +54,13 @@
 				body: formData
 			});
 
-			const result = await response.json();
+			const { data: result, isHtml } = await safeJsonParse<{ success: boolean; uploaded?: string[]; message?: string }>(response);
+			
+			if (isHtml || !result) {
+				error = 'Studio API not available. Studio requires server-side deployment.';
+				uploading = false;
+				return;
+			}
 
 			if (result.success) {
 				success = `Uploaded ${result.uploaded?.length || 0} file(s)`;
@@ -280,6 +300,37 @@
 	.copy-btn:hover {
 		background: var(--bg-accent);
 		border-color: var(--highlight);
+	}
+
+	.static-build-notice {
+		text-align: center;
+		padding: 4rem 2rem;
+		background: var(--bg-secondary);
+		border-radius: 12px;
+		border: 1px solid var(--border-subtle);
+		margin: 2rem 0;
+		max-width: 600px;
+		margin-left: auto;
+		margin-right: auto;
+	}
+
+	.static-build-notice h2 {
+		color: var(--text-primary);
+		margin-bottom: 1rem;
+	}
+
+	.static-build-notice p {
+		color: var(--text-secondary);
+		margin-bottom: 1rem;
+		line-height: 1.6;
+	}
+
+	.static-build-notice .back-link {
+		display: inline-block;
+		margin-top: 1.5rem;
+		color: var(--text-primary);
+		text-decoration: underline;
+		text-decoration-color: var(--highlight);
 	}
 </style>
 

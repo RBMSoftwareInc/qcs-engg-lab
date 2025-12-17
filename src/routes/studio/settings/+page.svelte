@@ -1,12 +1,20 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { safeJsonParse, checkApiAvailable } from '$lib/studio/api-utils';
 
 	let gitStatus = $state('');
 	let loading = $state(true);
 	let pulling = $state(false);
 	let error = $state('');
+	let isStaticBuild = $state(false);
 
 	onMount(async () => {
+		const apiAvailable = await checkApiAvailable();
+		if (!apiAvailable) {
+			isStaticBuild = true;
+			loading = false;
+			return;
+		}
 		await loadStatus();
 	});
 
@@ -14,10 +22,18 @@
 		loading = true;
 		try {
 			const response = await fetch('/studio/api/git/status');
-			const data = await response.json();
+			const { data, isHtml } = await safeJsonParse<{ status: string }>(response);
+			
+			if (isHtml || !data) {
+				isStaticBuild = true;
+				loading = false;
+				return;
+			}
+			
 			gitStatus = data.status || 'No changes';
 		} catch (err) {
 			error = 'Failed to load Git status';
+			isStaticBuild = true;
 		} finally {
 			loading = false;
 		}
@@ -28,7 +44,14 @@
 		error = '';
 		try {
 			const response = await fetch('/studio/api/git/pull', { method: 'POST' });
-			const data = await response.json();
+			const { data, isHtml } = await safeJsonParse<{ success: boolean; message?: string }>(response);
+			
+			if (isHtml || !data) {
+				error = 'Studio API not available. Studio requires server-side deployment.';
+				pulling = false;
+				return;
+			}
+			
 			if (data.success) {
 				await loadStatus();
 			} else {
@@ -92,8 +115,9 @@
 		</div>
 	</div>
 
-	{#if error}
-		<div class="alert alert-error">{error}</div>
+		{#if error}
+			<div class="alert alert-error">{error}</div>
+		{/if}
 	{/if}
 </div>
 

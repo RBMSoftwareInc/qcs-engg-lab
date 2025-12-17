@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import { safeJsonParse } from '$lib/studio/api-utils';
 
 	let title = $state('');
 	let category = $state('domains');
@@ -60,7 +61,13 @@
 				})
 			});
 
-			const result = await response.json();
+			const { data: result, isHtml } = await safeJsonParse<{ success: boolean; message?: string }>(response);
+			
+			if (isHtml || !result) {
+				error = 'Studio API not available. Studio requires server-side deployment.';
+				creating = false;
+				return;
+			}
 
 			if (result.success) {
 				// Find the file and redirect to edit

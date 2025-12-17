@@ -5,6 +5,7 @@
 	import TipTapEditor from '$lib/components/studio/TipTapEditor.svelte';
 	import ContentPreview from '$lib/components/studio/ContentPreview.svelte';
 	import DiffView from '$lib/components/studio/DiffView.svelte';
+	import { safeJsonParse } from '$lib/studio/api-utils';
 
 	let { data } = $props<PageData>();
 
@@ -132,7 +133,13 @@
 				})
 			});
 
-			const result = await response.json();
+			const { data: result, isHtml } = await safeJsonParse<{ success: boolean; message?: string }>(response);
+			
+			if (isHtml || !result) {
+				error = 'Studio API not available. Studio requires server-side deployment.';
+				saving = false;
+				return;
+			}
 
 			if (result.success) {
 				success = true;

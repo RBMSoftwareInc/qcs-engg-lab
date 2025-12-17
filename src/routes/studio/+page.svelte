@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
+	import { safeJsonParse, checkApiAvailable } from '$lib/studio/api-utils';
 
 	let contentFiles = $state<any[]>([]);
 	let categories = $state<Record<string, any[]>>({});
@@ -9,19 +10,10 @@
 	let isStaticBuild = $state(false);
 
 	onMount(async () => {
-		// Check if static build first
-		try {
-			const checkResponse = await fetch('/studio/api/auth/check', {
-				headers: { 'Accept': 'application/json' }
-			});
-			const contentType = checkResponse.headers.get('content-type') || '';
-			const text = await checkResponse.text();
-			if (contentType.includes('text/html') || text.trim().startsWith('<!')) {
-				isStaticBuild = true;
-				loading = false;
-				return;
-			}
-		} catch {
+		// Check if API is available
+		const apiAvailable = await checkApiAvailable();
+		
+		if (!apiAvailable) {
 			isStaticBuild = true;
 			loading = false;
 			return;
@@ -34,17 +26,14 @@
 		loading = true;
 		try {
 			const response = await fetch('/studio/api/content');
-			const contentType = response.headers.get('content-type') || '';
-			const text = await response.text();
+			const { data, isHtml } = await safeJsonParse<{ files: any[] }>(response);
 			
-			if (contentType.includes('text/html') || text.trim().startsWith('<!')) {
+			if (isHtml || !data) {
 				isStaticBuild = true;
 				loading = false;
 				return;
 			}
-			
-			const data = JSON.parse(text);
-			contentFiles = data.files || [];
+			contentFiles = data?.files || [];
 			
 			// Group by category
 			const grouped: Record<string, any[]> = {};
