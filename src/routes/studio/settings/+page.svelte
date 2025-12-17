@@ -115,9 +115,8 @@
 		</div>
 	</div>
 
-		{#if error}
-			<div class="alert alert-error">{error}</div>
-		{/if}
+	{#if error}
+		<div class="alert alert-error">{error}</div>
 	{/if}
 </div>
 
