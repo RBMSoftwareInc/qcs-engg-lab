@@ -6,7 +6,7 @@
  * Outputs .htaccess format for Apache servers.
  */
 
-import { readFileSync, readdirSync, statSync, writeFileSync } from 'fs';
+import { readFileSync, readdirSync, statSync, writeFileSync, mkdirSync, existsSync } from 'fs';
 import { join, extname } from 'path';
 import fm from 'front-matter';
 import type { ContentMetadata } from '../src/lib/content/schema.js';
@@ -82,7 +82,14 @@ function getRedirectMappings(): Map<string, string> {
 }
 
 const mappings = getRedirectMappings();
-const outputPath = join(process.cwd(), 'build', '.htaccess');
+const buildDir = join(process.cwd(), 'build');
+
+// Ensure build directory exists
+if (!existsSync(buildDir)) {
+	mkdirSync(buildDir, { recursive: true });
+}
+
+const outputPath = join(buildDir, '.htaccess');
 
 // Generate .htaccess redirect rules
 const redirectRules = Array.from(mappings.entries())
