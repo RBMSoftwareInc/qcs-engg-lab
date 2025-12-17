@@ -57,10 +57,15 @@
 
 <div class="studio-page">
 	<div class="page-header">
-		<h1>Content</h1>
-		<button class="new-content-btn" onclick={() => goto('/studio/new')}>
-			+ New Content
-		</button>
+		<div class="header-content">
+			<div>
+				<h1>Content</h1>
+				<p class="page-description">Manage all markdown content files. Edit, publish, and organize your content.</p>
+			</div>
+			<button class="new-content-btn" onclick={() => goto('/studio/new')}>
+				+ New Content
+			</button>
+		</div>
 	</div>
 
 	{#if loading}
@@ -128,19 +133,37 @@
 <style>
 	.studio-page {
 		width: 100%;
+		background: var(--bg-primary);
+		min-height: 100%;
 	}
 
 	.page-header {
+		background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+		padding: 2.5rem 0;
+		margin-bottom: 2rem;
+		border-bottom: 1px solid var(--border-subtle);
+	}
+
+	.header-content {
 		display: flex;
 		justify-content: space-between;
-		align-items: center;
-		margin-bottom: 2rem;
+		align-items: flex-start;
+		gap: 2rem;
 	}
 
 	.page-header h1 {
-		font-size: 2rem;
+		font-size: 2.5rem;
 		font-weight: 600;
+		margin: 0 0 0.5rem 0;
+		color: var(--text-primary);
+		letter-spacing: -0.02em;
+	}
+
+	.page-description {
+		font-size: 1.1rem;
+		color: var(--text-secondary);
 		margin: 0;
+		line-height: 1.6;
 	}
 
 	.new-content-btn {
@@ -159,17 +182,21 @@
 		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 	}
 
-	.loading,
-	.empty-state {
+	.loading {
 		text-align: center;
 		padding: 4rem 2rem;
 		color: var(--text-secondary);
+		background: var(--bg-secondary);
+		border-radius: 12px;
+		border: 1px solid var(--border-subtle);
+		margin: 2rem 0;
 	}
 
 	.content-layout {
 		display: grid;
 		grid-template-columns: 250px 1fr;
 		gap: 2rem;
+		margin-bottom: 3rem;
 	}
 
 	.category-sidebar {
@@ -229,6 +256,7 @@
 		display: grid;
 		grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
 		gap: 1.5rem;
+		margin-bottom: 3rem;
 	}
 
 	.content-card {

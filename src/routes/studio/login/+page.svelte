@@ -90,7 +90,8 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+		background: linear-gradient(to bottom, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+		background-attachment: fixed;
 		padding: 2rem;
 	}
 

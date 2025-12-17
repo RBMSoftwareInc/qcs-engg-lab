@@ -82,8 +82,13 @@
 
 <div class="new-content-page">
 	<div class="page-header">
-		<a href="/studio" class="back-link">← Back</a>
-		<h1>New Content</h1>
+		<div class="header-content">
+			<div>
+				<a href="/studio" class="back-link">← Back to Content</a>
+				<h1>New Content</h1>
+				<p class="page-description">Create a new markdown content file. Choose category and provide initial content.</p>
+			</div>
+		</div>
 	</div>
 
 	{#if error}
@@ -141,13 +146,23 @@
 	.new-content-page {
 		max-width: 800px;
 		margin: 0 auto;
+		width: 100%;
+		background: var(--bg-primary);
+		min-height: 100%;
 	}
 
 	.page-header {
-		display: flex;
-		align-items: center;
-		gap: 1rem;
+		background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+		padding: 2.5rem 0;
 		margin-bottom: 2rem;
+		border-bottom: 1px solid var(--border-subtle);
+	}
+
+	.header-content {
+		display: flex;
+		justify-content: space-between;
+		align-items: flex-start;
+		gap: 2rem;
 	}
 
 	.back-link {
@@ -162,9 +177,18 @@
 	}
 
 	.page-header h1 {
-		font-size: 2rem;
+		font-size: 2.5rem;
 		font-weight: 600;
+		margin: 0.5rem 0 0.5rem 0;
+		color: var(--text-primary);
+		letter-spacing: -0.02em;
+	}
+
+	.page-description {
+		font-size: 1.1rem;
+		color: var(--text-secondary);
 		margin: 0;
+		line-height: 1.6;
 	}
 
 	.alert {

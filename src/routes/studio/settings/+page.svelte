@@ -47,7 +47,12 @@
 </svelte:head>
 
 <div class="settings-page">
-	<h1>Settings</h1>
+	<div class="page-header">
+		<div>
+			<h1>Settings</h1>
+			<p class="page-description">Configure Git status, environment variables, and deployment settings.</p>
+		</div>
+	</div>
 
 	<div class="settings-section">
 		<h2>Git Status</h2>
@@ -95,20 +100,44 @@
 <style>
 	.settings-page {
 		max-width: 900px;
+		width: 100%;
+		background: var(--bg-primary);
+		min-height: 100%;
 	}
 
-	.settings-page h1 {
-		font-size: 2rem;
-		font-weight: 600;
+	.page-header {
+		background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+		padding: 2.5rem 0;
 		margin-bottom: 2rem;
+		border-bottom: 1px solid var(--border-subtle);
+	}
+
+	.page-header h1 {
+		font-size: 2.5rem;
+		font-weight: 600;
+		margin: 0 0 0.5rem 0;
+		color: var(--text-primary);
+		letter-spacing: -0.02em;
+	}
+
+	.page-description {
+		font-size: 1.1rem;
+		color: var(--text-secondary);
+		margin: 0;
+		line-height: 1.6;
 	}
 
 	.settings-section {
 		background: var(--bg-primary);
 		border: 1px solid var(--border-subtle);
-		border-radius: 8px;
+		border-radius: 12px;
 		padding: 2rem;
 		margin-bottom: 2rem;
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+	}
+
+	.settings-section:last-child {
+		margin-bottom: 3rem;
 	}
 
 	.settings-section h2 {

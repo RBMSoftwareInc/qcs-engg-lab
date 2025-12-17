@@ -199,8 +199,11 @@
 <div class="editor-page">
 	<div class="editor-header">
 		<div class="header-left">
-			<a href="/studio" class="back-link">← Back</a>
-			<h1>Edit Content</h1>
+			<a href="/studio" class="back-link">← Back to Content</a>
+			<div>
+				<h1>Edit Content</h1>
+				<p class="editor-subtitle">Modify content and frontmatter. Changes are saved to Git automatically.</p>
+			</div>
 		</div>
 		<div class="header-actions">
 			<div class="view-mode-toggle">
@@ -330,21 +333,22 @@
 <style>
 	.editor-page {
 		width: 100%;
+		background: var(--bg-primary);
+		min-height: 100%;
 	}
 
 	.editor-header {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
+		background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+		padding: 2rem 0;
 		margin-bottom: 2rem;
-		padding-bottom: 1rem;
 		border-bottom: 1px solid var(--border-subtle);
 	}
 
 	.header-left {
 		display: flex;
-		align-items: center;
-		gap: 1rem;
+		align-items: flex-start;
+		gap: 1.5rem;
+		flex: 1;
 	}
 
 	.back-link {
@@ -359,9 +363,18 @@
 	}
 
 	.editor-header h1 {
-		font-size: 1.5rem;
+		font-size: 2rem;
 		font-weight: 600;
+		margin: 0 0 0.5rem 0;
+		color: var(--text-primary);
+		letter-spacing: -0.02em;
+	}
+
+	.editor-subtitle {
+		font-size: 1rem;
+		color: var(--text-secondary);
 		margin: 0;
+		line-height: 1.6;
 	}
 
 	.header-actions {
@@ -431,11 +444,13 @@
 
 	.editor-sidebar {
 		background: var(--bg-secondary);
-		border-radius: 8px;
+		border: 1px solid var(--border-subtle);
+		border-radius: 12px;
 		padding: 1.5rem;
 		height: fit-content;
 		position: sticky;
-		top: 100px;
+		top: 150px;
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 	}
 
 	.form-group {
