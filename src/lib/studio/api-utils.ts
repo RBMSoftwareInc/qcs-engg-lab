@@ -1,21 +1,28 @@
 /**
  * Safe JSON parser for API responses
  * Handles static builds where API routes return HTML instead of JSON
+ * NEVER throws errors - always returns { data, isHtml }
  */
 export async function safeJsonParse<T = any>(response: Response): Promise<{ data: T | null; isHtml: boolean }> {
-	const contentType = response.headers.get('content-type') || '';
-	const text = await response.text();
-	
-	// Check if response is HTML (static build - API route doesn't exist)
-	if (contentType.includes('text/html') || text.trim().startsWith('<!')) {
-		return { data: null, isHtml: true };
-	}
-	
 	try {
-		const data = JSON.parse(text);
-		return { data, isHtml: false };
+		const contentType = response.headers.get('content-type') || '';
+		const text = await response.text();
+		
+		// Check if response is HTML (static build - API route doesn't exist)
+		if (contentType.includes('text/html') || text.trim().startsWith('<!')) {
+			return { data: null, isHtml: true };
+		}
+		
+		// Try to parse as JSON
+		try {
+			const data = JSON.parse(text);
+			return { data, isHtml: false };
+		} catch (parseError) {
+			// If parse fails, it's likely HTML
+			return { data: null, isHtml: true };
+		}
 	} catch (error) {
-		// If parse fails, likely HTML response
+		// If ANY error occurs (network, etc.), assume static build
 		return { data: null, isHtml: true };
 	}
 }

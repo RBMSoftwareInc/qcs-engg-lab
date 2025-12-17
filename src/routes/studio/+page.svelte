@@ -10,16 +10,24 @@
 	let isStaticBuild = $state(false);
 
 	onMount(async () => {
+		// IMMEDIATELY set loading to false to prevent UI blocking
+		loading = false;
+		
 		// Check if API is available
-		const apiAvailable = await checkApiAvailable();
-		
-		if (!apiAvailable) {
+		try {
+			const apiAvailable = await checkApiAvailable();
+			
+			if (!apiAvailable) {
+				isStaticBuild = true;
+				return;
+			}
+			
+			await loadContent();
+		} catch (error) {
+			// If ANY error, assume static build
 			isStaticBuild = true;
-			loading = false;
-			return;
+			console.warn('Studio not available on static hosting');
 		}
-		
-		await loadContent();
 	});
 
 	async function loadContent() {

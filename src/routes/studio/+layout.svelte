@@ -12,19 +12,26 @@
 	let isStaticBuild = $state(false);
 
 	onMount(async () => {
-		// Check if API is available
-		const apiAvailable = await checkApiAvailable();
-		
-		if (!apiAvailable) {
-			isStaticBuild = true;
-			if ($page.url.pathname !== '/studio/login') {
-				goto('/studio/login');
-			}
-			return;
-		}
-
-		// Check authentication status
+		// IMMEDIATELY check if we're in a static build to prevent any JSON parse errors
+		// Use a simple HEAD request first to avoid parsing
 		try {
+			const testResponse = await fetch('/studio/api/auth/check', {
+				method: 'HEAD',
+				headers: { 'Accept': 'application/json' }
+			});
+			
+			// If HEAD request works, try the actual check
+			const apiAvailable = await checkApiAvailable();
+			
+			if (!apiAvailable) {
+				isStaticBuild = true;
+				if ($page.url.pathname !== '/studio/login') {
+					goto('/studio/login');
+				}
+				return;
+			}
+
+			// Check authentication status
 			const response = await fetch('/studio/api/auth/check', {
 				method: 'GET',
 				headers: { 'Accept': 'application/json' }
@@ -48,7 +55,7 @@
 				goto('/studio/login');
 			}
 		} catch (error) {
-			// If fetch fails, we're likely in a static build
+			// If ANY error occurs, assume static build
 			isStaticBuild = true;
 			console.warn('Studio API not available - static build detected');
 			if ($page.url.pathname !== '/studio/login') {
