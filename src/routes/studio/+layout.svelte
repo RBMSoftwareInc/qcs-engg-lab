@@ -12,6 +12,19 @@
 		// Check authentication status
 		try {
 			const response = await fetch('/studio/api/auth/check');
+			
+			// Check if response is HTML (means API route doesn't exist - static build)
+			const contentType = response.headers.get('content-type');
+			if (contentType && contentType.includes('text/html')) {
+				// API routes not available in static build
+				console.warn('Studio API routes not available. Studio requires server-side capabilities.');
+				// Allow access to login page only
+				if ($page.url.pathname !== '/studio/login') {
+					goto('/studio/login');
+				}
+				return;
+			}
+			
 			const data = await response.json();
 			isAuthenticated = data.authenticated || false;
 			userEmail = data.email || null;
@@ -22,6 +35,7 @@
 			}
 		} catch (error) {
 			console.error('Auth check failed:', error);
+			// If JSON parse fails, likely HTML response (static build)
 			if ($page.url.pathname !== '/studio/login') {
 				goto('/studio/login');
 			}

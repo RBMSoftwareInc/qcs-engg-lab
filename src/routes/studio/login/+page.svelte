@@ -18,6 +18,14 @@
 				body: JSON.stringify({ email, password })
 			});
 
+			// Check if response is HTML (API route doesn't exist)
+			const contentType = response.headers.get('content-type');
+			if (contentType && contentType.includes('text/html')) {
+				error = 'Studio API not available. Studio requires server-side deployment (Node.js).';
+				loading = false;
+				return;
+			}
+
 			const data = await response.json();
 
 			if (data.success) {
@@ -26,7 +34,12 @@
 				error = data.message || 'Authentication failed';
 			}
 		} catch (err) {
-			error = 'Failed to connect to server';
+			// Check if it's a JSON parse error (HTML response)
+			if (err instanceof SyntaxError) {
+				error = 'Studio API not available. Studio requires server-side deployment (Node.js/VPS).';
+			} else {
+				error = 'Failed to connect to server';
+			}
 		} finally {
 			loading = false;
 		}
@@ -80,6 +93,22 @@
 
 		<div class="login-footer">
 			<a href="/">← Back to Site</a>
+		</div>
+
+		<div class="deployment-notice">
+			<p class="notice-title">⚠️ Studio Deployment Notice</p>
+			<p class="notice-text">
+				QCS Studio requires server-side capabilities (Node.js) to function. 
+				It cannot run on static hosting like Hostinger shared hosting.
+			</p>
+			<p class="notice-text">
+				<strong>Options:</strong>
+			</p>
+			<ul class="notice-list">
+				<li>Deploy to Hostinger VPS (supports Node.js)</li>
+				<li>Use a separate backend service (Vercel, Railway, etc.)</li>
+				<li>Run Studio locally for content management</li>
+			</ul>
 		</div>
 	</div>
 </div>
@@ -209,6 +238,40 @@
 
 	.login-footer a:hover {
 		color: var(--text-primary);
+	}
+
+	.deployment-notice {
+		margin-top: 2rem;
+		padding: 1.5rem;
+		background: rgba(244, 196, 48, 0.1);
+		border: 1px solid rgba(244, 196, 48, 0.3);
+		border-radius: 8px;
+	}
+
+	.notice-title {
+		font-weight: 600;
+		color: var(--text-primary);
+		margin-bottom: 0.75rem;
+		font-size: 0.95rem;
+	}
+
+	.notice-text {
+		font-size: 0.85rem;
+		color: var(--text-secondary);
+		line-height: 1.6;
+		margin-bottom: 0.5rem;
+	}
+
+	.notice-list {
+		margin-top: 0.75rem;
+		margin-left: 1.5rem;
+		font-size: 0.85rem;
+		color: var(--text-secondary);
+		line-height: 1.8;
+	}
+
+	.notice-list li {
+		margin-bottom: 0.25rem;
 	}
 </style>
 
