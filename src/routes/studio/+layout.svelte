@@ -1,4 +1,7 @@
 <script lang="ts">
+	// IMPORTANT: Load JSON patch FIRST before anything else
+	import '$lib/studio/json-patch';
+	
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
