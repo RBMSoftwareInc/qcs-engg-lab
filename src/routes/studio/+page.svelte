@@ -6,8 +6,27 @@
 	let categories = $state<Record<string, any[]>>({});
 	let loading = $state(true);
 	let selectedCategory = $state<string | null>(null);
+	let isStaticBuild = $state(false);
 
 	onMount(async () => {
+		// Check if static build first
+		try {
+			const checkResponse = await fetch('/studio/api/auth/check', {
+				headers: { 'Accept': 'application/json' }
+			});
+			const contentType = checkResponse.headers.get('content-type') || '';
+			const text = await checkResponse.text();
+			if (contentType.includes('text/html') || text.trim().startsWith('<!')) {
+				isStaticBuild = true;
+				loading = false;
+				return;
+			}
+		} catch {
+			isStaticBuild = true;
+			loading = false;
+			return;
+		}
+		
 		await loadContent();
 	});
 
@@ -15,7 +34,16 @@
 		loading = true;
 		try {
 			const response = await fetch('/studio/api/content');
-			const data = await response.json();
+			const contentType = response.headers.get('content-type') || '';
+			const text = await response.text();
+			
+			if (contentType.includes('text/html') || text.trim().startsWith('<!')) {
+				isStaticBuild = true;
+				loading = false;
+				return;
+			}
+			
+			const data = JSON.parse(text);
 			contentFiles = data.files || [];
 			
 			// Group by category
@@ -68,7 +96,14 @@
 		</div>
 	</div>
 
-	{#if loading}
+	{#if isStaticBuild}
+		<div class="static-build-notice">
+			<h2>Studio Not Available</h2>
+			<p>QCS Studio requires server-side capabilities and cannot run on static hosting.</p>
+			<p>Please use Studio locally or deploy to a Node.js-capable hosting service.</p>
+			<a href="/" class="back-link">← Back to Site</a>
+		</div>
+	{:else if loading}
 		<div class="loading">Loading content...</div>
 	{:else if contentFiles.length === 0}
 		<div class="empty-state">
@@ -190,6 +225,37 @@
 		border-radius: 12px;
 		border: 1px solid var(--border-subtle);
 		margin: 2rem 0;
+	}
+
+	.static-build-notice {
+		text-align: center;
+		padding: 4rem 2rem;
+		background: var(--bg-secondary);
+		border-radius: 12px;
+		border: 1px solid var(--border-subtle);
+		margin: 2rem 0;
+		max-width: 600px;
+		margin-left: auto;
+		margin-right: auto;
+	}
+
+	.static-build-notice h2 {
+		color: var(--text-primary);
+		margin-bottom: 1rem;
+	}
+
+	.static-build-notice p {
+		color: var(--text-secondary);
+		margin-bottom: 1rem;
+		line-height: 1.6;
+	}
+
+	.static-build-notice .back-link {
+		display: inline-block;
+		margin-top: 1.5rem;
+		color: var(--text-primary);
+		text-decoration: underline;
+		text-decoration-color: var(--highlight);
 	}
 
 	.content-layout {

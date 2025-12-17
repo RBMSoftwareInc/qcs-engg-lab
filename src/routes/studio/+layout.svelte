@@ -8,24 +8,39 @@
 	let isAuthenticated = $state(false);
 	let userEmail = $state<string | null>(null);
 
+	let isStaticBuild = $state(false);
+
 	onMount(async () => {
-		// Check authentication status
+		// Check if we're in a static build (no API routes available)
 		try {
-			const response = await fetch('/studio/api/auth/check');
+			const response = await fetch('/studio/api/auth/check', {
+				method: 'GET',
+				headers: { 'Accept': 'application/json' }
+			});
 			
 			// Check if response is HTML (means API route doesn't exist - static build)
-			const contentType = response.headers.get('content-type');
-			if (contentType && contentType.includes('text/html')) {
-				// API routes not available in static build
-				console.warn('Studio API routes not available. Studio requires server-side capabilities.');
-				// Allow access to login page only
+			const contentType = response.headers.get('content-type') || '';
+			if (contentType.includes('text/html')) {
+				isStaticBuild = true;
+				// Redirect to login page which will show the notice
 				if ($page.url.pathname !== '/studio/login') {
 					goto('/studio/login');
 				}
 				return;
 			}
 			
-			const data = await response.json();
+			// Try to parse as JSON
+			const text = await response.text();
+			if (text.trim().startsWith('<!')) {
+				// HTML response - static build
+				isStaticBuild = true;
+				if ($page.url.pathname !== '/studio/login') {
+					goto('/studio/login');
+				}
+				return;
+			}
+			
+			const data = JSON.parse(text);
 			isAuthenticated = data.authenticated || false;
 			userEmail = data.email || null;
 
@@ -34,8 +49,9 @@
 				goto('/studio/login');
 			}
 		} catch (error) {
-			console.error('Auth check failed:', error);
-			// If JSON parse fails, likely HTML response (static build)
+			// If fetch fails or JSON parse fails, we're likely in a static build
+			isStaticBuild = true;
+			console.warn('Studio API not available - static build detected');
 			if ($page.url.pathname !== '/studio/login') {
 				goto('/studio/login');
 			}
@@ -51,9 +67,9 @@
 	}
 </script>
 
-{#if isAuthenticated || $page.url.pathname === '/studio/login'}
+{#if isAuthenticated || $page.url.pathname === '/studio/login' || isStaticBuild}
 	<div class="studio-layout">
-		{#if isAuthenticated && $page.url.pathname !== '/studio/login'}
+		{#if isAuthenticated && $page.url.pathname !== '/studio/login' && !isStaticBuild}
 			<!-- Main Site Header (aligned with public site) -->
 			<nav class="main-site-header">
 				<div class="container">

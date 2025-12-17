@@ -1,13 +1,39 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import { onMount } from 'svelte';
 
 	let email = $state('');
 	let password = $state('');
 	let error = $state('');
 	let loading = $state(false);
+	let isStaticBuild = $state(false);
+
+	onMount(async () => {
+		// Check if we're in a static build
+		try {
+			const response = await fetch('/studio/api/auth/check', {
+				method: 'GET',
+				headers: { 'Accept': 'application/json' }
+			});
+			const contentType = response.headers.get('content-type') || '';
+			const text = await response.text();
+			
+			if (contentType.includes('text/html') || text.trim().startsWith('<!')) {
+				isStaticBuild = true;
+			}
+		} catch {
+			isStaticBuild = true;
+		}
+	});
 
 	async function handleLogin(e: Event) {
 		e.preventDefault();
+		
+		if (isStaticBuild) {
+			error = 'Studio requires server-side deployment. See notice below.';
+			return;
+		}
+		
 		error = '';
 		loading = true;
 
@@ -19,14 +45,16 @@
 			});
 
 			// Check if response is HTML (API route doesn't exist)
-			const contentType = response.headers.get('content-type');
-			if (contentType && contentType.includes('text/html')) {
+			const contentType = response.headers.get('content-type') || '';
+			const text = await response.text();
+			
+			if (contentType.includes('text/html') || text.trim().startsWith('<!')) {
 				error = 'Studio API not available. Studio requires server-side deployment (Node.js).';
 				loading = false;
 				return;
 			}
 
-			const data = await response.json();
+			const data = JSON.parse(text);
 
 			if (data.success) {
 				goto('/studio');
@@ -95,21 +123,26 @@
 			<a href="/">← Back to Site</a>
 		</div>
 
-		<div class="deployment-notice">
-			<p class="notice-title">⚠️ Studio Deployment Notice</p>
-			<p class="notice-text">
-				QCS Studio requires server-side capabilities (Node.js) to function. 
-				It cannot run on static hosting like Hostinger shared hosting.
-			</p>
-			<p class="notice-text">
-				<strong>Options:</strong>
-			</p>
-			<ul class="notice-list">
-				<li>Deploy to Hostinger VPS (supports Node.js)</li>
-				<li>Use a separate backend service (Vercel, Railway, etc.)</li>
-				<li>Run Studio locally for content management</li>
-			</ul>
-		</div>
+		{#if isStaticBuild}
+			<div class="deployment-notice">
+				<p class="notice-title">⚠️ Studio Not Available on Static Hosting</p>
+				<p class="notice-text">
+					QCS Studio requires server-side capabilities (Node.js) to function. 
+					It cannot run on static hosting like Hostinger shared hosting.
+				</p>
+				<p class="notice-text">
+					<strong>Solutions:</strong>
+				</p>
+				<ul class="notice-list">
+					<li><strong>Hostinger VPS:</strong> Upgrade to VPS hosting (supports Node.js)</li>
+					<li><strong>Separate Backend:</strong> Deploy Studio API to Vercel/Railway/Render</li>
+					<li><strong>Local Development:</strong> Run Studio locally, deploy static site only</li>
+				</ul>
+				<p class="notice-text" style="margin-top: 1rem; font-size: 0.8rem; color: var(--text-muted);">
+					The public website works perfectly on static hosting. Only Studio requires server-side capabilities.
+				</p>
+			</div>
+		{/if}
 	</div>
 </div>
 
