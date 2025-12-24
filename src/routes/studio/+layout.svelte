@@ -12,7 +12,7 @@
 	let isAuthenticated = $state(false);
 	let userEmail = $state<string | null>(null);
 
-	let isStaticBuild = $state(true); // Start as true to prevent any API calls
+	let isStaticBuild = $state(false); // Will be set after check
 
 	// Global error handler to catch ANY JSON parse errors
 	if (typeof window !== 'undefined') {
@@ -344,6 +344,90 @@
 		}
 	}
 
+	.static-build-notice-full {
+		min-height: 100vh;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: 2rem;
+		background: linear-gradient(to bottom, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+	}
+
+	.notice-content {
+		max-width: 700px;
+		background: var(--bg-primary);
+		border: 1px solid var(--border-subtle);
+		border-radius: 12px;
+		padding: 3rem;
+		box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+		text-align: center;
+	}
+
+	.notice-content h1 {
+		font-size: 2rem;
+		margin-bottom: 1rem;
+		color: var(--text-primary);
+	}
+
+	.notice-content > p {
+		font-size: 1.1rem;
+		color: var(--text-secondary);
+		margin-bottom: 2rem;
+	}
+
+	.notice-options {
+		text-align: left;
+		margin: 2rem 0;
+		background: var(--bg-secondary);
+		padding: 1.5rem;
+		border-radius: 8px;
+	}
+
+	.notice-options h3 {
+		font-size: 1.1rem;
+		margin-bottom: 1rem;
+		color: var(--text-primary);
+	}
+
+	.notice-options ul {
+		list-style: none;
+		padding: 0;
+		margin: 0;
+	}
+
+	.notice-options li {
+		margin-bottom: 1rem;
+		padding-left: 1.5rem;
+		position: relative;
+		color: var(--text-secondary);
+		line-height: 1.6;
+	}
+
+	.notice-options li::before {
+		content: '→';
+		position: absolute;
+		left: 0;
+		color: var(--highlight);
+		font-weight: 600;
+	}
+
+	.notice-options code {
+		background: var(--bg-primary);
+		padding: 0.2rem 0.5rem;
+		border-radius: 4px;
+		font-family: 'IBM Plex Mono', monospace;
+		font-size: 0.9em;
+	}
+
+	.notice-content .back-link {
+		display: inline-block;
+		margin-top: 2rem;
+		color: var(--text-primary);
+		text-decoration: underline;
+		text-decoration-color: var(--highlight);
+		font-weight: 500;
+	}
+
 	@media (max-width: 768px) {
 		.main-site-header .container,
 		.studio-sub-nav .container {
@@ -362,6 +446,10 @@
 		.studio-main {
 			margin-top: 120px;
 			padding: 1.5rem;
+		}
+
+		.notice-content {
+			padding: 2rem 1.5rem;
 		}
 	}
 </style>
