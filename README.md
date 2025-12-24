@@ -298,19 +298,50 @@ See [docs/GITHUB_RATE_LIMITS.md](./docs/GITHUB_RATE_LIMITS.md) for details.
 
 ## 🚢 Deployment
 
-### Static Site (Public)
-1. Build: `npm run build`
-2. Upload `/build` directory to hosting
-3. Configure SPA fallback (see [docs/DEPLOYMENT.md](./docs/DEPLOYMENT.md))
+### GitHub Pages (Public Site)
+
+**Deploy your public website to GitHub Pages for free:**
+
+1. Enable GitHub Pages in repository settings
+2. Push code to `main` branch
+3. GitHub Actions automatically builds and deploys
+4. Site live at: `https://yourusername.github.io/repo-name`
+
+**Note:** Studio (CMS) won't work on GitHub Pages (requires Node.js). Deploy Studio separately to Vercel or run locally.
+
+See **[docs/GITHUB_PAGES_DEPLOY.md](./docs/GITHUB_PAGES_DEPLOY.md)** for complete guide.
+
+### Netlify Deployment (Recommended - Studio Works!)
+
+**Deploy both public site and Studio to Netlify:**
+1. Install Netlify adapter: `npm install -D @sveltejs/adapter-netlify`
+2. Update `svelte.config.js` to use Netlify adapter
+3. Push to GitHub
+4. Import repo to [Netlify](https://app.netlify.com)
+5. Add environment variables
+6. Deploy!
+
+See **[NETLIFY_QUICKSTART.md](./NETLIFY_QUICKSTART.md)** for quick start or **[docs/NETLIFY_DEPLOY.md](./docs/NETLIFY_DEPLOY.md)** for complete guide.
+
+### Studio Deployment (Alternative: Vercel)
+
+**Deploy Studio to Vercel in 5 minutes:**
+1. Push code to GitHub
+2. Import repo to [Vercel](https://vercel.com)
+3. Add environment variables
+4. Deploy!
+
+See **[docs/QUICK_DEPLOY_GUIDE.md](./docs/QUICK_DEPLOY_GUIDE.md)** for step-by-step instructions.
 
 ### Studio (Server-Side)
 Studio requires Node.js runtime. Options:
-- **Vercel** – Serverless functions
-- **Netlify** – Serverless functions
-- **Node.js Hosting** – Traditional hosting
-- **Not supported**: Static hosting (Hostinger static hosting)
+- **Vercel** – Recommended (free, easy, auto-deploy from Git)
+- **Railway** – Free tier, simple setup
+- **Render** – Free tier, reliable
+- **Hostinger VPS** – If you have VPS hosting
+- **Not supported**: Static hosting (GitHub Pages, Hostinger shared hosting)
 
-See [docs/DEPLOYMENT.md](./docs/DEPLOYMENT.md) for details.
+See [docs/DEPLOY_STUDIO.md](./docs/DEPLOY_STUDIO.md) for complete deployment guide.
 
 ## 📝 Content Workflow
 

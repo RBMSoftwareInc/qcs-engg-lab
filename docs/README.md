@@ -5,6 +5,8 @@ This folder contains all documentation for the QCS Engineering Lab project.
 ## 📚 Documentation Structure
 
 ### Getting Started
+- **[QUICK_DEPLOY_GUIDE.md](./QUICK_DEPLOY_GUIDE.md)** – 5-minute deployment guide (Start here!)
+- **[DEPLOY_STUDIO.md](./DEPLOY_STUDIO.md)** – Complete Studio deployment guide
 - **[ENV_SETUP.md](./ENV_SETUP.md)** – Complete environment variable setup guide
 - **[STUDIO_SETUP.md](./STUDIO_SETUP.md)** – Studio setup and configuration
 - **[QUICK_DEPLOY.md](./QUICK_DEPLOY.md)** – Quick deployment guide
@@ -19,6 +21,8 @@ This folder contains all documentation for the QCS Engineering Lab project.
 - **[STUDIO_GITHUB_API_SOLUTION.md](./STUDIO_GITHUB_API_SOLUTION.md)** – GitHub API integration details
 
 ### Deployment
+- **[NETLIFY_DEPLOY.md](./NETLIFY_DEPLOY.md)** – Complete Netlify deployment guide (Studio works!)
+- **[GITHUB_PAGES_DEPLOY.md](./GITHUB_PAGES_DEPLOY.md)** – Deploy public site to GitHub Pages
 - **[DEPLOYMENT.md](./DEPLOYMENT.md)** – General deployment instructions
 - **[DEPLOY_CHECKLIST.md](./DEPLOY_CHECKLIST.md)** – Pre-deployment checklist
 - **[STUDIO_DEPLOYMENT.md](./STUDIO_DEPLOYMENT.md)** – Studio-specific deployment
