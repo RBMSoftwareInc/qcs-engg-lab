@@ -6,11 +6,8 @@
   NODE_VERSION = "20"
   NPM_FLAGS = "--legacy-peer-deps"
 
-# SPA fallback for client-side routing
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
+# Note: Redirects are handled automatically by @sveltejs/adapter-netlify
+# No need to define redirects here - the adapter generates them
 
 # Headers for security and performance
 [[headers]]
