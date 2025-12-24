@@ -82,38 +82,60 @@
 {#if isAuthenticated || $page.url.pathname === '/studio/login' || isStaticBuild}
 	<div class="studio-layout">
 		{#if isAuthenticated && $page.url.pathname !== '/studio/login' && !isStaticBuild}
-			<!-- Main Site Header (aligned with public site) -->
-			<nav class="main-site-header">
-				<div class="container">
-					<a href="/" class="nav-logo" aria-label="QuantumCore Solutions">
-						<Logo size={36} variant="full" showText={true} />
-					</a>
-					
-					<div class="main-nav-links">
-						<a href="/practice">Practice</a>
-						<a href="/philosophy">Philosophy</a>
-						<a href="/insights">Insights</a>
-						<a href="/signals">Signals</a>
-						<a href="/about">About</a>
+			<!-- Studio Header with Logo and Navigation -->
+			<nav class="studio-header">
+				<div class="studio-header-container">
+					<div class="studio-header-left">
+						<a href="/" class="studio-logo-link" aria-label="QuantumCore Solutions">
+							<Logo size={32} variant="monogram" showText={false} />
+						</a>
+						<div class="studio-brand">
+							<span class="studio-brand-text">Studio</span>
+						</div>
+						<div class="studio-nav-links">
+							<a href="/studio" class:active={$page.url.pathname === '/studio' || $page.url.pathname.startsWith('/studio/edit')}>
+								<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+									<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+									<polyline points="14 2 14 8 20 8"></polyline>
+									<line x1="16" y1="13" x2="8" y2="13"></line>
+									<line x1="16" y1="17" x2="8" y2="17"></line>
+								</svg>
+								<span>Content</span>
+							</a>
+							<a href="/studio/design-skins" class:active={$page.url.pathname === '/studio/design-skins'}>
+								<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+									<rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+									<circle cx="8.5" cy="8.5" r="1.5"></circle>
+									<polyline points="21 15 16 10 5 21"></polyline>
+								</svg>
+								<span>Design Skins</span>
+							</a>
+							<a href="/studio/media" class:active={$page.url.pathname === '/studio/media'}>
+								<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+									<rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+									<circle cx="8.5" cy="8.5" r="1.5"></circle>
+									<polyline points="21 15 16 10 5 21"></polyline>
+								</svg>
+								<span>Media</span>
+							</a>
+							<a href="/studio/settings" class:active={$page.url.pathname === '/studio/settings'}>
+								<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+									<circle cx="12" cy="12" r="3"></circle>
+									<path d="M12 1v6m0 6v6M5.64 5.64l4.24 4.24m4.24 4.24l4.24 4.24M1 12h6m6 0h6M5.64 18.36l4.24-4.24m4.24-4.24l4.24-4.24"></path>
+								</svg>
+								<span>Settings</span>
+							</a>
+						</div>
 					</div>
-					
-					<div class="main-nav-actions">
+					<div class="studio-header-right">
 						<span class="studio-user-email">{userEmail}</span>
-						<button class="studio-logout-btn" onclick={handleLogout}>Logout</button>
-					</div>
-				</div>
-			</nav>
-
-			<!-- Studio Sub-Navigation -->
-			<nav class="studio-sub-nav">
-				<div class="container">
-					<div class="studio-nav-brand">
-						<strong>QCS Studio</strong>
-					</div>
-					<div class="studio-nav-links">
-						<a href="/studio" class:active={$page.url.pathname === '/studio' || $page.url.pathname.startsWith('/studio/edit')}>Content</a>
-						<a href="/studio/media" class:active={$page.url.pathname === '/studio/media'}>Media</a>
-						<a href="/studio/settings" class:active={$page.url.pathname === '/studio/settings'}>Settings</a>
+						<button class="studio-logout-btn" onclick={handleLogout} title="Logout">
+							<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+								<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+								<polyline points="16 17 21 12 16 7"></polyline>
+								<line x1="21" y1="12" x2="9" y2="12"></line>
+							</svg>
+						</button>
 					</div>
 				</div>
 			</nav>
@@ -128,89 +150,108 @@
 <style>
 	.studio-layout {
 		min-height: 100vh;
-		background: linear-gradient(to bottom, var(--bg-primary) 0%, var(--bg-secondary) 100%);
-		background-attachment: fixed;
+		background: var(--bg-primary);
 		display: flex;
 		flex-direction: column;
 		padding-top: 0;
 	}
 
-	/* Main Site Header - Matches public site header */
-	.main-site-header {
+	/* Studio Header - Single unified header */
+	.studio-header {
 		position: fixed;
 		top: 0;
 		left: 0;
 		right: 0;
 		z-index: 1000;
-		background: rgba(255, 253, 247, 0.95);
-		backdrop-filter: blur(10px);
+		background: rgba(255, 255, 255, 0.98);
+		backdrop-filter: blur(20px);
 		border-bottom: 1px solid var(--border-subtle);
-		box-shadow: 0 2px 20px rgba(0, 0, 0, 0.05);
+		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+		height: 64px;
 	}
 
-	.main-site-header .container {
-		max-width: 1200px;
+	.studio-header-container {
+		max-width: 1600px;
 		margin: 0 auto;
-		padding: 1rem 2rem;
+		padding: 0 2rem;
+		height: 100%;
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
 		gap: 2rem;
 	}
 
-	@media (min-width: 768px) {
-		.main-site-header .container {
-			padding: 1rem 4rem;
-		}
+	.studio-header-left {
+		display: flex;
+		align-items: center;
+		gap: 1.5rem;
+		flex: 1;
 	}
 
-	@media (min-width: 1024px) {
-		.main-site-header .container {
-			padding: 1rem 6rem;
-		}
-	}
-
-	.nav-logo {
+	.studio-logo-link {
 		display: flex;
 		align-items: center;
 		text-decoration: none;
 		flex-shrink: 0;
 	}
 
-	.main-nav-links {
+	.studio-brand {
 		display: flex;
-		gap: 1.5rem;
-		flex: 1;
+		align-items: center;
+	}
+
+	.studio-brand-text {
+		font-size: 1.25rem;
+		font-weight: 600;
+		color: var(--text-primary);
+		letter-spacing: -0.02em;
+	}
+
+	.studio-nav-links {
+		display: flex;
+		gap: 0.5rem;
 		margin-left: 2rem;
 	}
 
-	.main-nav-links a {
-		font-size: 1rem;
-		font-weight: 500;
+	.studio-nav-links a {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 0.5rem 1rem;
 		color: var(--text-secondary);
 		text-decoration: none;
-		position: relative;
-		padding-bottom: 2px;
-		border-bottom: none;
+		font-weight: 500;
+		font-size: 0.9rem;
+		border-radius: 6px;
 		transition: all 0.2s ease;
+		position: relative;
 	}
 
-	.main-nav-links a::after {
-		content: '';
-		position: absolute;
-		bottom: 0;
-		left: 0;
-		width: 0;
-		height: 2px;
-		background: var(--highlight);
-		transition: width 0.3s ease;
+	.studio-nav-links a svg {
+		flex-shrink: 0;
+		opacity: 0.7;
+		transition: opacity 0.2s ease;
 	}
 
-	.main-nav-links a:hover::after {
-		width: 100%;
+	.studio-nav-links a:hover {
+		background: var(--bg-secondary);
+		color: var(--text-primary);
 	}
 
-	.main-nav-actions {
+	.studio-nav-links a:hover svg {
+		opacity: 1;
+	}
+
+	.studio-nav-links a.active {
+		background: var(--bg-secondary);
+		color: var(--text-primary);
+	}
+
+	.studio-nav-links a.active svg {
+		opacity: 1;
+	}
+
+	.studio-header-right {
 		display: flex;
 		align-items: center;
 		gap: 1rem;
@@ -218,102 +259,43 @@
 	}
 
 	.studio-user-email {
-		font-size: 0.9rem;
+		font-size: 0.875rem;
 		color: var(--text-secondary);
+		padding: 0.5rem 0;
 	}
 
 	.studio-logout-btn {
-		padding: 0.5rem 1rem;
-		background: var(--bg-secondary);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 36px;
+		height: 36px;
+		padding: 0;
+		background: transparent;
 		border: 1px solid var(--border-subtle);
 		border-radius: 6px;
 		cursor: pointer;
-		font-size: 0.9rem;
-		color: var(--text-primary);
+		color: var(--text-secondary);
 		transition: all 0.2s ease;
-		font-weight: 500;
 	}
 
 	.studio-logout-btn:hover {
-		background: var(--bg-accent);
-		border-color: var(--highlight);
+		background: var(--bg-secondary);
+		border-color: var(--border-subtle);
+		color: var(--text-primary);
 		transform: translateY(-1px);
-	}
-
-	/* Studio Sub-Navigation */
-	.studio-sub-nav {
-		position: fixed;
-		top: 70px; /* Below main header */
-		left: 0;
-		right: 0;
-		z-index: 999;
-		background: var(--bg-primary);
-		border-bottom: 1px solid var(--border-subtle);
-		box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
-	}
-
-	.studio-sub-nav .container {
-		max-width: 1200px;
-		margin: 0 auto;
-		padding: 0.75rem 2rem;
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		gap: 2rem;
-	}
-
-	@media (min-width: 768px) {
-		.studio-sub-nav .container {
-			padding: 0.75rem 4rem;
-		}
-	}
-
-	@media (min-width: 1024px) {
-		.studio-sub-nav .container {
-			padding: 0.75rem 6rem;
-		}
-	}
-
-	.studio-nav-brand {
-		font-size: 1.1rem;
-		font-weight: 600;
-		color: var(--text-primary);
-		flex-shrink: 0;
-	}
-
-	.studio-nav-links {
-		display: flex;
-		gap: 2rem;
-		flex: 1;
-		margin-left: 2rem;
-	}
-
-	.studio-nav-links a {
-		color: var(--text-secondary);
-		text-decoration: none;
-		font-weight: 500;
-		font-size: 0.95rem;
-		padding: 0.5rem 0;
-		border-bottom: 2px solid transparent;
-		transition: all 0.2s ease;
-		position: relative;
-	}
-
-	.studio-nav-links a:hover,
-	.studio-nav-links a.active {
-		color: var(--text-primary);
-		border-bottom-color: var(--highlight);
 	}
 
 	.studio-main {
 		flex: 1;
 		padding: 0;
-		max-width: 1200px;
+		max-width: 1600px;
 		width: 100%;
 		margin: 0 auto;
-		margin-top: 130px; /* Space for both headers */
-		min-height: calc(100vh - 130px);
+		margin-top: 64px;
+		min-height: calc(100vh - 64px);
 		background: transparent;
+		padding-top: 0;
 	}
 
 	.studio-main :global(.studio-page),
@@ -321,10 +303,28 @@
 	.studio-main :global(.new-content-page),
 	.studio-main :global(.settings-page),
 	.studio-main :global(.media-page) {
-		padding: 0 2rem;
+		padding: 2rem 2rem 0 2rem;
 	}
 
 	@media (min-width: 768px) {
+		.studio-header-container {
+			padding: 0 3rem;
+		}
+		
+		.studio-main :global(.studio-page),
+		.studio-main :global(.editor-page),
+		.studio-main :global(.new-content-page),
+		.studio-main :global(.settings-page),
+		.studio-main :global(.media-page) {
+			padding: 0 3rem;
+		}
+	}
+
+	@media (min-width: 1024px) {
+		.studio-header-container {
+			padding: 0 4rem;
+		}
+		
 		.studio-main :global(.studio-page),
 		.studio-main :global(.editor-page),
 		.studio-main :global(.new-content-page),
@@ -334,13 +334,17 @@
 		}
 	}
 
-	@media (min-width: 1024px) {
+	@media (min-width: 1440px) {
+		.studio-header-container {
+			padding: 0 5rem;
+		}
+		
 		.studio-main :global(.studio-page),
 		.studio-main :global(.editor-page),
 		.studio-main :global(.new-content-page),
 		.studio-main :global(.settings-page),
 		.studio-main :global(.media-page) {
-			padding: 0 6rem;
+			padding: 0 5rem;
 		}
 	}
 
@@ -429,27 +433,34 @@
 	}
 
 	@media (max-width: 768px) {
-		.main-site-header .container,
-		.studio-sub-nav .container {
-			padding: 1rem 2rem;
-		}
-
-		.main-nav-links {
-			display: none; /* Hide on mobile */
+		.studio-header-container {
+			padding: 0 1.5rem;
 		}
 
 		.studio-nav-links {
-			margin-left: 0;
-			gap: 1rem;
+			margin-left: 1rem;
+			gap: 0.25rem;
+		}
+
+		.studio-nav-links a span {
+			display: none;
+		}
+
+		.studio-nav-links a {
+			padding: 0.5rem;
+		}
+
+		.studio-user-email {
+			display: none;
 		}
 
 		.studio-main {
-			margin-top: 120px;
-			padding: 1.5rem;
+			margin-top: 64px;
 		}
 
-		.notice-content {
-			padding: 2rem 1.5rem;
+		.studio-main :global(.studio-page),
+		.studio-main :global(.editor-page) {
+			padding: 0 1.5rem;
 		}
 	}
 </style>

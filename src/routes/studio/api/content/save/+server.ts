@@ -1,8 +1,13 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { validateSession } from '$lib/studio/auth';
-import { writeAndCommit, getSafeContentPath, validateContentPath } from '$lib/studio/git';
-import path from 'node:path';
+import { 
+	createOrUpdateFile, 
+	getFileContent,
+	getSafeContentPath, 
+	validateContentPath 
+} from '$lib/studio/github-api';
+import { validateMarkdown, validateFilePath, validateCommitMessage } from '$lib/studio/validators';
 
 export const POST: RequestHandler = async ({ request, cookies }) => {
 	// Check authentication
@@ -21,35 +26,81 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 	}
 
 	try {
-		const { path: filePath, content, commitMessage } = await request.json();
+		const { path: filePath, content, commitMessage, sha } = await request.json();
 
 		if (!filePath || !content) {
 			return json({ success: false, message: 'Path and content required' }, { status: 400 });
 		}
 
-		const contentDir = path.join(process.cwd(), 'content');
-		const fullPath = getSafeContentPath(filePath, contentDir);
+		// Validate commit message
+		const commitValidation = validateCommitMessage(commitMessage || `Update ${filePath}`);
+		if (!commitValidation.valid) {
+			return json({ 
+				success: false, 
+				message: 'Invalid commit message',
+				errors: commitValidation.errors
+			}, { status: 400 });
+		}
 
-		// Validate path is within content directory
-		if (!validateContentPath(fullPath, contentDir)) {
+		// Validate file path
+		const pathValidation = validateFilePath(filePath, ['.md']);
+		if (!pathValidation.valid) {
+			return json({ 
+				success: false, 
+				message: 'Invalid file path',
+				errors: pathValidation.errors
+			}, { status: 400 });
+		}
+
+		// Validate markdown content
+		const contentValidation = validateMarkdown(content);
+		if (!contentValidation.valid) {
+			return json({ 
+				success: false, 
+				message: 'Invalid markdown content',
+				errors: contentValidation.errors
+			}, { status: 400 });
+		}
+
+		// Validate and get safe path
+		const safePath = getSafeContentPath(filePath, 'content');
+
+		// Validate path is within allowed directories
+		if (!validateContentPath(safePath, ['content'])) {
 			return json({ success: false, message: 'Invalid file path' }, { status: 400 });
 		}
 
 		// Ensure .md extension
-		const finalPath = fullPath.endsWith('.md') ? fullPath : `${fullPath}.md`;
+		const finalPath = safePath.endsWith('.md') ? safePath : `${safePath}.md`;
 
-		// Write and commit
-		const result = await writeAndCommit(
+		// If SHA not provided, try to get it (for updates)
+		let fileSha = sha;
+		if (!fileSha) {
+			const existingFile = await getFileContent(finalPath);
+			if (existingFile.success && existingFile.data) {
+				fileSha = existingFile.data.sha;
+			}
+		}
+
+		// Create or update file via GitHub API
+		const result = await createOrUpdateFile(
 			finalPath,
 			content,
 			commitMessage || `Update ${filePath}`,
-			process.cwd()
+			fileSha
 		);
 
 		if (result.success) {
-			return json({ success: true, message: 'Content saved and committed' });
+			return json({ 
+				success: true, 
+				message: 'Content saved and committed to GitHub',
+				commit: result.data
+			});
 		} else {
-			return json({ success: false, message: result.message || 'Failed to save' }, { status: 500 });
+			return json({ 
+				success: false, 
+				message: result.error || 'Failed to save' 
+			}, { status: 500 });
 		}
 	} catch (error: any) {
 		return json({ success: false, message: error.message || 'Server error' }, { status: 500 });

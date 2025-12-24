@@ -8,6 +8,7 @@
 	let loading = $state(true);
 	let selectedCategory = $state<string | null>(null);
 	let isStaticBuild = $state(false);
+	let isAuthenticated = $state(false);
 
 	onMount(async () => {
 		// IMMEDIATELY set loading to false to prevent UI blocking
@@ -22,7 +23,29 @@
 				return;
 			}
 			
-			await loadContent();
+			// Check authentication first
+			try {
+				const authResponse = await fetch('/studio/api/auth/check');
+				const { data: authData, isHtml: authIsHtml } = await safeJsonParse<{ authenticated: boolean }>(authResponse);
+				
+				if (authIsHtml || !authData?.authenticated) {
+					// Not authenticated, redirect to login
+					goto('/studio/login');
+					return;
+				}
+				
+				isAuthenticated = true;
+			} catch (authError) {
+				// Auth check failed, redirect to login
+				console.warn('Authentication check failed:', authError);
+				goto('/studio/login');
+				return;
+			}
+			
+			// Only load content if authenticated
+			if (isAuthenticated) {
+				await loadContent();
+			}
 		} catch (error) {
 			// If ANY error, assume static build
 			isStaticBuild = true;
@@ -31,9 +54,28 @@
 	});
 
 	async function loadContent() {
+		if (!isAuthenticated) {
+			goto('/studio/login');
+			return;
+		}
+		
 		loading = true;
 		try {
 			const response = await fetch('/studio/api/content');
+			
+			// Check if unauthorized
+			if (response.status === 401) {
+				// Redirect to login
+				isAuthenticated = false;
+				goto('/studio/login');
+				loading = false;
+				return;
+			}
+			
+			if (!response.ok) {
+				throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+			}
+			
 			const { data, isHtml } = await safeJsonParse<{ files: any[] }>(response);
 			
 			if (isHtml || !data) {
@@ -57,6 +99,11 @@
 			}
 		} catch (error) {
 			console.error('Failed to load content:', error);
+			// If it's an auth error, redirect to login
+			if (error instanceof Error && (error.message.includes('401') || error.message.includes('Unauthorized'))) {
+				isAuthenticated = false;
+				goto('/studio/login');
+			}
 		} finally {
 			loading = false;
 		}
@@ -87,8 +134,12 @@
 				<h1>Content</h1>
 				<p class="page-description">Manage all markdown content files. Edit, publish, and organize your content.</p>
 			</div>
-			<button class="new-content-btn" onclick={() => goto('/studio/new')}>
-				+ New Content
+			<button class="new-content-btn" onclick={() => goto('/studio/new')} title="Create New Content">
+				<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+					<line x1="12" y1="5" x2="12" y2="19"></line>
+					<line x1="5" y1="12" x2="19" y2="12"></line>
+				</svg>
+				<span>New Content</span>
 			</button>
 		</div>
 	</div>
@@ -170,9 +221,9 @@
 	}
 
 	.page-header {
-		background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
-		padding: 2.5rem 0;
-		margin-bottom: 2rem;
+		background: var(--bg-primary);
+		padding: 1rem 0;
+		margin-bottom: 1.5rem;
 		border-bottom: 1px solid var(--border-subtle);
 	}
 
@@ -199,14 +250,23 @@
 	}
 
 	.new-content-btn {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
 		padding: 0.75rem 1.5rem;
 		background: var(--text-primary);
 		color: var(--bg-primary);
 		border: none;
 		border-radius: 8px;
 		font-weight: 600;
+		font-size: 0.875rem;
 		cursor: pointer;
 		transition: all 0.2s ease;
+		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+	}
+
+	.new-content-btn svg {
+		flex-shrink: 0;
 	}
 
 	.new-content-btn:hover {

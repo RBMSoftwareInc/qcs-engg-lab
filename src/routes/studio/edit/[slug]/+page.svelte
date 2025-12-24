@@ -22,6 +22,7 @@
 	
 	// View modes: 'edit' | 'preview' | 'split' | 'diff'
 	let viewMode = $state<'edit' | 'preview' | 'split' | 'diff'>('edit');
+	let showSkinPreview = $state(false);
 	
 	// Autosave
 	let autosaveTimer: ReturnType<typeof setTimeout> | null = null;
@@ -220,7 +221,11 @@
 					onclick={() => viewMode = 'edit'}
 					title="Edit Mode"
 				>
-					Edit
+					<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+						<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+						<path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+					</svg>
+					<span>Edit</span>
 				</button>
 				<button
 					class="mode-btn"
@@ -228,7 +233,11 @@
 					onclick={() => viewMode = 'preview'}
 					title="Preview Mode"
 				>
-					Preview
+					<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+						<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+						<circle cx="12" cy="12" r="3"></circle>
+					</svg>
+					<span>Preview</span>
 				</button>
 				<button
 					class="mode-btn"
@@ -236,7 +245,11 @@
 					onclick={() => viewMode = 'split'}
 					title="Split View"
 				>
-					Split
+					<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+						<rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+						<line x1="12" y1="3" x2="12" y2="21"></line>
+					</svg>
+					<span>Split</span>
 				</button>
 				<button
 					class="mode-btn"
@@ -244,21 +257,39 @@
 					onclick={() => viewMode = 'diff'}
 					title="Compare with Live"
 				>
-					Diff
+					<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+						<path d="M12 3v18M3 12h18"></path>
+					</svg>
+					<span>Diff</span>
 				</button>
 			</div>
 			<div class="save-actions">
 				{#if hasUnsavedChanges}
-					<span class="unsaved-indicator">Unsaved changes</span>
+					<span class="unsaved-indicator">
+						<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+							<circle cx="12" cy="12" r="10"></circle>
+						</svg>
+						Unsaved changes
+					</span>
 				{/if}
 				{#if lastSaved}
 					<span class="last-saved">Saved {lastSaved.toLocaleTimeString()}</span>
 				{/if}
-				<button class="save-btn" onclick={handleSave} disabled={saving}>
-					{saving ? 'Saving...' : 'Save Draft'}
+				<button class="save-btn" onclick={handleSave} disabled={saving} title="Save as Draft">
+					<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+						<path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+						<polyline points="17 21 17 13 7 13 7 21"></polyline>
+						<polyline points="7 3 7 8 15 8"></polyline>
+					</svg>
+					<span>{saving ? 'Saving...' : 'Save Draft'}</span>
 				</button>
-				<button class="publish-btn" onclick={handlePublish} disabled={saving}>
-					Publish
+				<button class="publish-btn" onclick={handlePublish} disabled={saving} title="Publish to Live">
+					<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+						<line x1="12" y1="5" x2="12" y2="19"></line>
+						<line x1="5" y1="12" x2="19" y2="12"></line>
+						<circle cx="12" cy="12" r="10"></circle>
+					</svg>
+					<span>Publish</span>
 				</button>
 			</div>
 		</div>
@@ -298,6 +329,16 @@
 				<input type="number" id="order" bind:value={order} />
 			</div>
 
+			{#if viewMode === 'preview' || viewMode === 'split'}
+				<div class="form-group">
+					<label class="checkbox-label">
+						<input type="checkbox" bind:checked={showSkinPreview} />
+						<span>Preview with Design Skin</span>
+					</label>
+					<small>Apply active design skin CSS to preview</small>
+				</div>
+			{/if}
+
 			<div class="file-info">
 				<p><strong>Path:</strong> {data.file.relativePath}</p>
 				<p><strong>Slug:</strong> {data.file.slug}</p>
@@ -313,7 +354,7 @@
 				/>
 			{:else if viewMode === 'preview'}
 				<div class="preview-container">
-					<ContentPreview markdown={content} />
+					<ContentPreview markdown={content} showSkinPreview={showSkinPreview} />
 				</div>
 			{:else if viewMode === 'split'}
 				<div class="split-container">
@@ -325,7 +366,7 @@
 						/>
 					</div>
 					<div class="split-preview">
-						<ContentPreview markdown={content} />
+						<ContentPreview markdown={content} showSkinPreview={showSkinPreview} />
 					</div>
 				</div>
 			{:else if viewMode === 'diff'}
@@ -345,7 +386,7 @@
 	}
 
 	.editor-header {
-		background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+		background: var(--bg-primary);
 		padding: 2rem 0;
 		margin-bottom: 2rem;
 		border-bottom: 1px solid var(--border-subtle);
@@ -359,14 +400,33 @@
 	}
 
 	.back-link {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
 		color: var(--text-secondary);
 		text-decoration: none;
 		font-size: 0.9rem;
 		transition: color 0.2s ease;
+		padding: 0.5rem 0;
 	}
 
 	.back-link:hover {
 		color: var(--text-primary);
+	}
+
+	.back-link::before {
+		content: '';
+		width: 16px;
+		height: 16px;
+		background-image: url("data:image/svg+xml,%3Csvg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Cpath d='M19 12H5M12 19l-7-7 7-7'%3E%3C/path%3E%3C/svg%3E");
+		background-repeat: no-repeat;
+		background-position: center;
+		opacity: 0.7;
+		transition: opacity 0.2s ease;
+	}
+
+	.back-link:hover::before {
+		opacity: 1;
 	}
 
 	.editor-header h1 {
@@ -490,6 +550,26 @@
 	.form-group select:focus {
 		outline: none;
 		border-color: var(--highlight);
+	}
+
+	.checkbox-label {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		cursor: pointer;
+	}
+
+	.checkbox-label input[type="checkbox"] {
+		width: auto;
+		margin: 0;
+		cursor: pointer;
+	}
+
+	.form-group small {
+		display: block;
+		margin-top: 0.5rem;
+		font-size: 0.8rem;
+		color: var(--text-secondary);
 	}
 
 	.file-info {
