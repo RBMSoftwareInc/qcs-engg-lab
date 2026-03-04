@@ -95,12 +95,17 @@
 </svelte:head>
 
 <Section class="about-hero">
-	<Reveal>
-		<h1>About</h1>
-		<p class="hero-intro">
-			We are an engineering lab focused on systems architecture, not a consultancy or agency. Our work centers on research-driven engineering and architectural thinking.
-		</p>
-	</Reveal>
+	<div class="about-hero-content">
+		<Reveal>
+			<h1>About</h1>
+			<p class="hero-intro">
+				We are an engineering lab focused on systems architecture, not a consultancy or agency. Our work centers on research-driven engineering and architectural thinking.
+			</p>
+		</Reveal>
+		<div class="about-hero-image">
+			<img src="/assets/images/shared/about-engg.svg" alt="" role="presentation" loading="lazy" />
+		</div>
+	</div>
 </Section>
 
 <Section class="stats-section">
@@ -183,6 +188,29 @@
 	.about-hero {
 		text-align: center;
 		padding: 4rem 0 3rem;
+	}
+
+	.about-hero-content {
+		display: grid;
+		grid-template-columns: 1fr;
+		gap: 2rem;
+		align-items: center;
+		max-width: 1000px;
+		margin: 0 auto;
+	}
+	@media (min-width: 768px) {
+		.about-hero-content {
+			grid-template-columns: 1fr auto;
+			text-align: left;
+		}
+	}
+	.about-hero-image {
+		opacity: 0.7;
+	}
+	.about-hero-image img {
+		width: 100%;
+		max-width: 320px;
+		height: auto;
 	}
 
 	.hero-intro {

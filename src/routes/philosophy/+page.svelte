@@ -12,7 +12,7 @@
 			description: 'Infrastructure is a means, not an end.',
 			details:
 				'We focus on architectural decisions that create lasting value, not infrastructure choices that become technical debt. Every system we design begins with architectural thinking—understanding how components interact, how data flows, and how the system will evolve. Infrastructure follows architecture, not the other way around.',
-			image: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=600&q=80'
+			image: '/assets/images/shared/philosophy-engg.svg'
 		},
 		{
 			id: 'systems',
@@ -21,7 +21,7 @@
 			description: 'Every component exists within a system.',
 			details:
 				'We design with system-level understanding, considering interactions, dependencies, and emergent behaviors. A component optimized in isolation often degrades system performance. We model systems holistically, understanding that the whole is greater than the sum of its parts.',
-			image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&q=80'
+			image: '/assets/images/shared/philosophy-engg.svg'
 		},
 		{
 			id: 'research',
@@ -30,7 +30,7 @@
 			description: 'Engineering decisions informed by evidence, not assumptions.',
 			details:
 				'We maintain a research-driven approach to all architectural decisions. Before we build, we study. Before we commit, we validate. Our solutions are grounded in proven patterns, tested methodologies, and real-world evidence. This isn\'t academic—it\'s practical engineering at scale.',
-			image: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=600&q=80'
+			image: '/assets/images/shared/philosophy-engg.svg'
 		},
 		{
 			id: 'complexity',
@@ -39,7 +39,7 @@
 			description: 'Complexity is the enemy of maintainability.',
 			details:
 				'We design systems with minimal necessary complexity, removing abstractions that don\'t serve clear purposes. Every layer, every abstraction, every pattern must justify its existence. Simplicity is not the absence of sophistication—it\'s the presence of clarity.',
-			image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&q=80'
+			image: '/assets/images/shared/philosophy-engg.svg'
 		},
 		{
 			id: 'longterm',
@@ -48,7 +48,7 @@
 			description: 'Systems outlive their initial requirements.',
 			details:
 				'We design for evolution, not just current needs. Architecture should enable future changes, not constrain them. The systems we build today must serve organizations for years, adapting to new requirements, scaling to new demands, and evolving with business needs.',
-			image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&q=80'
+			image: '/assets/images/shared/philosophy-engg.svg'
 		},
 		{
 			id: 'production',
@@ -57,7 +57,7 @@
 			description: 'Theoretical elegance must meet production reality.',
 			details:
 				'We design systems that are elegant in theory and robust in practice, tested under real-world conditions. Production is the ultimate test. Our architectures are battle-tested, performance-validated, and operationally proven. Theory without practice is incomplete engineering.',
-			image: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=600&q=80'
+			image: '/assets/images/shared/philosophy-engg.svg'
 		}
 	];
 </script>
@@ -68,12 +68,17 @@
 </svelte:head>
 
 <Section class="philosophy-hero">
-	<Reveal>
-		<h1>Engineering Philosophy</h1>
-		<p class="philosophy-intro">
-			Our approach to systems architecture and engineering. Six principles that guide every decision, every design, every implementation.
-		</p>
-	</Reveal>
+	<div class="philosophy-hero-inner">
+		<Reveal>
+			<h1>Engineering Philosophy</h1>
+			<p class="philosophy-intro">
+				Our approach to systems architecture and engineering. Six principles that guide every decision, every design, every implementation.
+			</p>
+		</Reveal>
+		<div class="philosophy-hero-image">
+			<img src="/assets/images/shared/philosophy-engg.svg" alt="" role="presentation" loading="lazy" />
+		</div>
+	</div>
 </Section>
 
 <Section class="philosophy-slider-section">
@@ -119,6 +124,28 @@
 	.philosophy-hero {
 		text-align: center;
 		padding: 3rem 0 2rem;
+	}
+	.philosophy-hero-inner {
+		display: grid;
+		grid-template-columns: 1fr;
+		gap: 2rem;
+		align-items: center;
+		max-width: 1000px;
+		margin: 0 auto;
+	}
+	@media (min-width: 768px) {
+		.philosophy-hero-inner {
+			grid-template-columns: 1fr auto;
+			text-align: left;
+		}
+	}
+	.philosophy-hero-image {
+		opacity: 0.7;
+	}
+	.philosophy-hero-image img {
+		max-width: 280px;
+		width: 100%;
+		height: auto;
 	}
 
 	.philosophy-intro {

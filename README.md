@@ -333,6 +333,12 @@ See **[NETLIFY_QUICKSTART.md](./NETLIFY_QUICKSTART.md)** for quick start or **[d
 
 See **[docs/QUICK_DEPLOY_GUIDE.md](./docs/QUICK_DEPLOY_GUIDE.md)** for step-by-step instructions.
 
+### Hostinger (Static or VPS)
+- **Shared hosting**: Build with `BUILD_STATIC=1 npm run build`, then upload the contents of `build/` to `public_html/`. Studio will not run (static only).
+- **VPS / Node**: Run the app with Node and set env vars; Studio works.
+
+See **[DEPLOYMENT.md](./DEPLOYMENT.md)** for step-by-step Hostinger and Netlify instructions.
+
 ### Studio (Server-Side)
 Studio requires Node.js runtime. Options:
 - **Vercel** – Recommended (free, easy, auto-deploy from Git)
@@ -386,6 +392,7 @@ See [docs/DEPLOY_STUDIO.md](./docs/DEPLOY_STUDIO.md) for complete deployment gui
 ## 📖 Additional Resources
 
 - **Environment Setup**: [docs/ENV_SETUP.md](./docs/ENV_SETUP.md)
+- **SEO & Analytics**: [docs/SEO_ANALYTICS.md](./docs/SEO_ANALYTICS.md) – GTM, GA4, sitemap, Search Console
 - **Feature Summary**: [docs/STUDIO_EXTENSION_SUMMARY.md](./docs/STUDIO_EXTENSION_SUMMARY.md)
 - **Content System**: [docs/CONTENT_SYSTEM.md](./docs/CONTENT_SYSTEM.md)
 - **Deployment Guide**: [docs/DEPLOYMENT.md](./docs/DEPLOYMENT.md)

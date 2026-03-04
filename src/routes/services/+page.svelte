@@ -17,7 +17,7 @@
 		title: service.metadata.title,
 		description: service.metadata.description || '',
 		details: service.content.substring(0, 200) + '...',
-		image: service.metadata.image || 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=800&q=80'
+		image: service.metadata.image || '/assets/images/shared/services-engg.svg'
 	}));
 
 	function handleViewMore(slug: string) {
@@ -38,12 +38,17 @@
 </svelte:head>
 
 <Section class="services-hero">
-	<Reveal>
-		<h1>Engineering Services</h1>
-		<p class="services-intro">
-			We architect, develop, and optimize enterprise systems. Our services are designed to extend your capabilities, accelerate your innovation, and deliver measurable business outcomes.
-		</p>
-	</Reveal>
+	<div class="services-hero-inner">
+		<Reveal>
+			<h1>Engineering Services</h1>
+			<p class="services-intro">
+				We architect, develop, and optimize enterprise systems. Our services are designed to extend your capabilities, accelerate your innovation, and deliver measurable business outcomes.
+			</p>
+		</Reveal>
+		<div class="services-hero-image">
+			<img src="/assets/images/shared/services-engg.svg" alt="" role="presentation" loading="lazy" />
+		</div>
+	</div>
 </Section>
 
 {#if featuredServices.length > 0}
@@ -104,6 +109,28 @@
 		text-align: center;
 		padding: 4rem 0 3rem;
 		background: linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+	}
+	.services-hero-inner {
+		display: grid;
+		grid-template-columns: 1fr;
+		gap: 2rem;
+		align-items: center;
+		max-width: 1000px;
+		margin: 0 auto;
+	}
+	@media (min-width: 768px) {
+		.services-hero-inner {
+			grid-template-columns: 1fr auto;
+			text-align: left;
+		}
+	}
+	.services-hero-image {
+		opacity: 0.7;
+	}
+	.services-hero-image img {
+		max-width: 320px;
+		width: 100%;
+		height: auto;
 	}
 
 	.services-intro {

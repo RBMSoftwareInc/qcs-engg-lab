@@ -1,0 +1,11 @@
+<svg width="360" height="240" viewBox="0 0 360 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs><style>.e{stroke:#1F2937;stroke-width:1.5;fill:none;opacity:0.45}.n{stroke:#1F2937;stroke-width:2;fill:#FFFDF7}</style></defs>
+  <circle cx="180" cy="120" r="70" class="e"/>
+  <circle cx="180" cy="120" r="50" class="e"/>
+  <circle cx="180" cy="120" r="30" class="e"/>
+  <circle cx="180" cy="120" r="12" class="n"/>
+  <line x1="180" y1="50" x2="180" y2="190" class="e"/>
+  <line x1="110" y1="120" x2="250" y2="120" class="e"/>
+  <line x1="135" y1="75" x2="225" y2="165" class="e"/>
+  <line x1="225" y1="75" x2="135" y2="165" class="e"/>
+</svg>

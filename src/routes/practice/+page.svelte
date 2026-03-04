@@ -9,7 +9,18 @@
 	const domains = loadContentByDirectory('domains');
 	const services = loadContentByDirectory('services');
 	
-	// Combine and sort by order if present
+	// Distinct images per card (no repetition)
+	const PRACTICE_IMAGES = [
+		'/assets/images/shared/practice-1-layers.svg',
+		'/assets/images/shared/practice-2-nodes.svg',
+		'/assets/images/shared/practice-3-pipeline.svg',
+		'/assets/images/shared/practice-4-grid.svg',
+		'/assets/images/shared/practice-5-modules.svg',
+		'/assets/images/shared/practice-6-radial.svg'
+	];
+	function getPracticeImage(item: { metadata: { diagram?: string; image?: string } }, index: number) {
+		return item.metadata.diagram || item.metadata.image || PRACTICE_IMAGES[index % PRACTICE_IMAGES.length];
+	}
 	const practiceItems = [...domains, ...services].sort((a, b) => {
 		const orderA = a.metadata.order ?? 999;
 		const orderB = b.metadata.order ?? 999;
@@ -40,7 +51,7 @@
 					description={item.metadata.description || ''}
 					slug={item.slug}
 					order={index}
-					image={item.metadata.diagram || item.metadata.image}
+					image={getPracticeImage(item, index)}
 					fullContent={item.content}
 					html={item.html}
 					onView={() => {
@@ -48,7 +59,7 @@
 							title: item.metadata.title,
 							description: item.metadata.description,
 							slug: item.slug,
-							image: item.metadata.diagram || item.metadata.image,
+							image: getPracticeImage(item, index),
 							html: item.html,
 							content: item.content
 						};

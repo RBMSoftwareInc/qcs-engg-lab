@@ -1,0 +1,16 @@
+[
+  {
+    "id": "cr-0b3b85aa48aed924",
+    "authorEmail": "admin@quantumcoresolutions.com",
+    "status": "open",
+    "createdAt": "2026-03-02T16:46:34.800Z",
+    "title": "About the Lab",
+    "description": "QuantumCore Solutions Engineering Lab.",
+    "files": [
+      {
+        "path": "content/about/lab.md",
+        "content": "---\ntitle: \"About the Lab\"\nstatus: \"draft\"\norder: 1\ndescription: \"QuantumCore Solutions Engineering Lab.\"\n---\n\n## Engineering Lab\nWe are an engineering lab focused on systems architecture, not a consultancy or agency. Our work centers on research-driven engineering and architectural thinking.\n\n## Research-Driven\nEvery project is an opportunity to advance our understanding of systems architecture. We maintain a research-driven approach, documenting learningss and sharing insights.\n## Architecture Focus\nWe focus on architectural decisions that create lasting value. Infrastructure choices are means to architectural ends, not ends in themselves.\n## Systems Thinking\nWe approach every problem with systems thinking. Components exist within systems, and we design with system-level understanding.\n## Long-Term Perspective\nSystems outlive their initial requirements. We design for evolution, enabling future changes rather than constraining them."
+      }
+    ]
+  }
+]

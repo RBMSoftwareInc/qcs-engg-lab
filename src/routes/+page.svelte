@@ -9,6 +9,19 @@
 	import GridOverlay from '$lib/components/GridOverlay.svelte';
 	import { loadContentByDirectory, loadContentByPath } from '$lib/content/loader';
 
+	// Same distinct images as /practice – no placeholders on home
+	const PRACTICE_IMAGES = [
+		'/assets/images/shared/practice-1-layers.svg',
+		'/assets/images/shared/practice-2-nodes.svg',
+		'/assets/images/shared/practice-3-pipeline.svg',
+		'/assets/images/shared/practice-4-grid.svg',
+		'/assets/images/shared/practice-5-modules.svg',
+		'/assets/images/shared/practice-6-radial.svg'
+	];
+	function getPracticeImage(item: { metadata: { diagram?: string; image?: string } }, index: number) {
+		return item.metadata.diagram || item.metadata.image || PRACTICE_IMAGES[index % PRACTICE_IMAGES.length];
+	}
+
 	// Load content - wrap in try/catch to prevent route crash
 	let heroContent: any = null;
 	let practiceItems: any[] = [];
@@ -41,13 +54,17 @@
 	<Hero
 		statement={heroContent.metadata.title}
 		subline={heroContent.metadata.description}
+		tagline={heroContent.metadata.tagline}
 		image={heroContent.metadata.heroImage}
+		offerings={heroContent.metadata.offerings}
 	/>
 {:else}
-	<Section>
-		<h1>Architecture before infrastructure.</h1>
-		<p class="hero-subline">Systems designed to evolve.</p>
-	</Section>
+	<Hero
+		statement="Architecture before infrastructure."
+		subline="Systems designed to evolve. We engineer clarity into complexity."
+		tagline="We architect and evolve enterprise systems for organisations that build to last."
+		offerings="Practice · Philosophy · Insights · Neural · Forge"
+	/>
 {/if}
 
 <Section id="practice">
@@ -66,7 +83,7 @@
 						description={item.metadata.description}
 						slug={item.slug}
 						order={index}
-						image={item.metadata.diagram || item.metadata.image}
+						image={getPracticeImage(item, index)}
 						fullContent={item.content}
 						html={item.html}
 						onView={() => {
@@ -74,7 +91,7 @@
 								title: item.metadata.title,
 								description: item.metadata.description,
 								slug: item.slug,
-								image: item.metadata.diagram || item.metadata.image,
+								image: getPracticeImage(item, index),
 								html: item.html,
 								content: item.content
 							};
@@ -102,14 +119,37 @@
 	{/if}
 </Section>
 
-<style>
-	.hero-subline {
-		font-size: 1.5rem;
-		color: var(--text-secondary);
-		font-weight: 400;
-		margin-top: 1rem;
-	}
+<Section id="proof" className="proof-section">
+	<Reveal>
+		<h2>Outcomes & trust</h2>
+		<p class="proof-intro">
+			Organisations we've worked with and the results that matter.
+		</p>
+	</Reveal>
+	<div class="proof-logos">
+		{#each ['Enterprise', 'Healthcare', 'Fintech', 'Government', 'Research'] as name}
+			<Reveal delay={0.05}>
+				<div class="proof-logo">{name}</div>
+			</Reveal>
+		{/each}
+	</div>
+	<div class="proof-quotes">
+		<Reveal delay={0.1}>
+			<blockquote class="proof-quote">
+				<p>“QCS gave us a clear architecture that scaled with our growth. We shipped faster and with fewer surprises.”</p>
+				<cite>— Engineering lead, enterprise platform</cite>
+			</blockquote>
+		</Reveal>
+		<Reveal delay={0.15}>
+			<blockquote class="proof-quote">
+				<p>“They think in systems, not just features. The documentation and boundaries they put in place are still our reference years later.”</p>
+				<cite>— CTO, regulated industry</cite>
+			</blockquote>
+		</Reveal>
+	</div>
+</Section>
 
+<style>
 	.practice-grid {
 		display: grid;
 		grid-template-columns: 1fr;
@@ -165,5 +205,69 @@
 
 	.practice-link a:hover {
 		border-bottom-color: var(--text-primary);
+	}
+
+	/* Proof: logos + outcome quotes */
+	.proof-intro {
+		font-size: 1.15rem;
+		line-height: 1.7;
+		color: var(--text-secondary);
+		margin-bottom: 2rem;
+		max-width: 800px;
+	}
+
+	.proof-logos {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: center;
+		gap: 1.25rem 2rem;
+		margin-bottom: 3rem;
+	}
+
+	.proof-logo {
+		font-size: 0.9rem;
+		font-weight: 600;
+		letter-spacing: 0.06em;
+		color: var(--text-muted);
+		padding: 0.5rem 1rem;
+		border: 1px solid var(--border-subtle);
+		border-radius: 6px;
+		background: rgba(255, 255, 255, 0.5);
+	}
+
+	.proof-quotes {
+		display: grid;
+		grid-template-columns: 1fr;
+		gap: 2rem;
+		max-width: 900px;
+		margin: 0 auto;
+	}
+
+	@media (min-width: 768px) {
+		.proof-quotes {
+			grid-template-columns: 1fr 1fr;
+		}
+	}
+
+	.proof-quote {
+		margin: 0;
+		padding: 1.5rem 1.25rem;
+		background: rgba(255, 253, 247, 0.8);
+		border-left: 3px solid var(--highlight);
+		border-radius: 0 8px 8px 0;
+		text-align: left;
+	}
+
+	.proof-quote p {
+		font-size: 1rem;
+		line-height: 1.65;
+		color: var(--text-primary);
+		margin-bottom: 0.75rem;
+	}
+
+	.proof-quote cite {
+		font-size: 0.85rem;
+		color: var(--text-muted);
+		font-style: normal;
 	}
 </style>

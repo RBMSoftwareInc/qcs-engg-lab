@@ -1,0 +1,13 @@
+<svg width="400" height="280" viewBox="0 0 400 280" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs><style>.e{stroke:#1F2937;stroke-width:1;fill:none;opacity:0.35}.n{stroke:#1F2937;stroke-width:2;fill:#FFFDF7}</style></defs>
+  <line x1="80" y1="60" x2="80" y2="220" class="e"/><line x1="160" y1="60" x2="160" y2="220" class="e"/>
+  <line x1="240" y1="60" x2="240" y2="220" class="e"/><line x1="320" y1="60" x2="320" y2="220" class="e"/>
+  <line x1="80" y1="60" x2="320" y2="60" class="e"/><line x1="80" y1="140" x2="320" y2="140" class="e"/>
+  <line x1="80" y1="220" x2="320" y2="220" class="e"/>
+  <rect x="90" y="70" width="60" height="60" rx="4" class="e"/>
+  <rect x="170" y="70" width="60" height="60" rx="4" class="e"/>
+  <rect x="250" y="70" width="60" height="60" rx="4" class="e"/>
+  <circle cx="120" cy="100" r="12" class="n"/>
+  <circle cx="200" cy="100" r="12" class="n"/>
+  <circle cx="280" cy="100" r="12" class="n"/>
+</svg>

@@ -94,6 +94,17 @@ class RateLimiter {
 // This is per-server-instance, so multiple users share the same limit
 export const githubRateLimiter = new RateLimiter(4000, 60 * 60 * 1000);
 
+/** Per-key (e.g. per IP) limit for public form submissions to avoid repo spam */
+export const formRateLimiter = new RateLimiter(5, 60 * 60 * 1000);
+
+export function checkFormRateLimit(key: string): { allowed: boolean; resetAt?: number } {
+	const allowed = formRateLimiter.canMakeRequest(key);
+	return {
+		allowed,
+		resetAt: formRateLimiter.getResetTime(key) ?? undefined
+	};
+}
+
 /**
  * Middleware to check rate limit before GitHub API calls
  */

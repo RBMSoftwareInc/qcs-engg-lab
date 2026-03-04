@@ -1,0 +1,55 @@
+{
+  "title": "Test",
+  "slug": "test",
+  "blocks": [
+    {
+      "id": "9cf3aa84",
+      "type": "hero",
+      "props": {
+        "title": "Headline",
+        "subtitle": "",
+        "tagline": "",
+        "image": "",
+        "ctaText": "Get started",
+        "ctaLink": "#"
+      }
+    },
+    {
+      "id": "a34546cf",
+      "type": "text",
+      "props": {
+        "content": "<p>Add your text here.</p>",
+        "align": "left"
+      }
+    },
+    {
+      "id": "6400cfbc",
+      "type": "image",
+      "props": {
+        "src": "",
+        "alt": "Image",
+        "caption": "",
+        "link": ""
+      }
+    },
+    {
+      "id": "544cb5d5",
+      "type": "spacer",
+      "props": {
+        "height": "2rem"
+      }
+    },
+    {
+      "id": "7d821030",
+      "type": "list",
+      "props": {
+        "items": [
+          "Item 1",
+          "Item 2",
+          "Item 3"
+        ],
+        "ordered": false
+      }
+    }
+  ]
+}

@@ -40,11 +40,17 @@ echo -e "${GREEN}Running pre-deployment checks...${NC}"
 npm run check
 
 # Build the site
+# For Hostinger (static upload): use BUILD_STATIC=1 to output to build/
+# For Netlify: push to Git and let Netlify build (no build/ dir); skip this script or run without BUILD_STATIC
 echo -e "${GREEN}Building site for production...${NC}"
-NODE_ENV=production npm run build
+if [ -n "$BUILD_STATIC" ]; then
+    NODE_ENV=production BUILD_STATIC=1 npm run build
+else
+    NODE_ENV=production npm run build
+fi
 
-# Check if build was successful
-if [ ! -d "build" ]; then
+# Check if build was successful (for static deploy, build/ must exist)
+if [ -n "$BUILD_STATIC" ] && [ ! -d "build" ]; then
     echo -e "${RED}Error: Build directory not found. Build may have failed.${NC}"
     exit 1
 fi
@@ -64,6 +70,8 @@ git push origin $CURRENT_BRANCH
 
 echo -e "${GREEN}✅ Deployment initiated!${NC}"
 echo ""
-echo "If using Hostinger Git deployment, it will auto-deploy."
-echo "Otherwise, upload the 'build/' directory to Hostinger public_html/"
+echo "Next steps:"
+echo "  • Netlify: Push to Git; Netlify will build and deploy. Studio works."
+echo "  • Hostinger (static): Run BUILD_STATIC=1 npm run build, then upload contents of build/ to public_html/"
+echo "  See DEPLOYMENT.md for full instructions."
 

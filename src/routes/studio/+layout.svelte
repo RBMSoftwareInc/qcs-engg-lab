@@ -6,13 +6,16 @@
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
 	import Logo from '$lib/components/Logo.svelte';
+	import StudioAntigravity from '$lib/components/StudioAntigravity.svelte';
 	import { safeJsonParse, checkApiAvailable } from '$lib/studio/api-utils';
 
 	let { children } = $props();
 	let isAuthenticated = $state(false);
 	let userEmail = $state<string | null>(null);
+	let userRole = $state<string | null>(null);
 
 	let isStaticBuild = $state(false); // Will be set after check
+	let inIframe = $state(false); // Hide header/footer when embedded in settings modal
 
 	// Global error handler to catch ANY JSON parse errors
 	if (typeof window !== 'undefined') {
@@ -29,6 +32,8 @@
 	}
 
 	onMount(async () => {
+		inIframe = typeof window !== 'undefined' && window.self !== window.top;
+
 		// IMMEDIATELY assume static build to prevent ANY API calls
 		// Only check if we're NOT on login page (login page handles its own check)
 		if ($page.url.pathname === '/studio/login') {
@@ -48,12 +53,13 @@
 					method: 'GET',
 					headers: { 'Accept': 'application/json' }
 				})
-					.then((response) => safeJsonParse<{ authenticated: boolean; email: string | null }>(response))
+					.then((response) => safeJsonParse<{ authenticated: boolean; email: string | null; role?: string }>(response))
 					.then(({ data, isHtml }) => {
 						if (!isHtml && data) {
 							isStaticBuild = false;
 							isAuthenticated = data.authenticated || false;
 							userEmail = data.email || null;
+							userRole = data.role ?? null;
 						}
 					})
 					.catch(() => {
@@ -80,17 +86,22 @@
 </script>
 
 {#if isAuthenticated || $page.url.pathname === '/studio/login' || isStaticBuild}
-	<div class="studio-layout">
-		{#if isAuthenticated && $page.url.pathname !== '/studio/login' && !isStaticBuild}
+	<div class="studio-layout" class:studio-embed={inIframe}>
+		{#if !inIframe}
+			<div class="studio-antigravity-wrap" aria-hidden="true">
+				<StudioAntigravity />
+			</div>
+		{/if}
+		{#if isAuthenticated && $page.url.pathname !== '/studio/login' && !isStaticBuild && !inIframe}
 			<!-- Studio Header with Logo and Navigation -->
 			<nav class="studio-header">
 				<div class="studio-header-container">
 					<div class="studio-header-left">
-						<a href="/" class="studio-logo-link" aria-label="QuantumCore Solutions">
-							<Logo size={32} variant="monogram" showText={false} />
+						<a href="/" class="studio-logo-link" aria-label="QuantumCore Solutions – Home">
+							<Logo size={36} variant="full" showText={false} />
 						</a>
 						<div class="studio-brand">
-							<span class="studio-brand-text">Studio</span>
+							<span class="studio-brand-text">QCS Studio</span>
 						</div>
 						<div class="studio-nav-links">
 							<a href="/studio" class:active={$page.url.pathname === '/studio' || $page.url.pathname.startsWith('/studio/edit')}>
@@ -102,6 +113,15 @@
 								</svg>
 								<span>Content</span>
 							</a>
+							<a href="/studio/builder" class:active={$page.url.pathname === '/studio/builder' || $page.url.pathname.startsWith('/studio/builder/')}>
+								<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+									<rect x="3" y="3" width="7" height="7"></rect>
+									<rect x="14" y="3" width="7" height="7"></rect>
+									<rect x="3" y="14" width="7" height="7"></rect>
+									<rect x="14" y="14" width="7" height="7"></rect>
+								</svg>
+								<span>Builder</span>
+							</a>
 							<a href="/studio/design-skins" class:active={$page.url.pathname === '/studio/design-skins'}>
 								<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
 									<rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
@@ -109,6 +129,14 @@
 									<polyline points="21 15 16 10 5 21"></polyline>
 								</svg>
 								<span>Design Skins</span>
+							</a>
+							<a href="/studio/templates" class:active={$page.url.pathname === '/studio/templates'}>
+								<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+									<rect x="3" y="4" width="18" height="5" rx="1"></rect>
+									<rect x="3" y="11" width="18" height="5" rx="1"></rect>
+									<rect x="3" y="18" width="18" height="4" rx="1"></rect>
+								</svg>
+								<span>Templates</span>
 							</a>
 							<a href="/studio/media" class:active={$page.url.pathname === '/studio/media'}>
 								<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -118,13 +146,25 @@
 								</svg>
 								<span>Media</span>
 							</a>
-							<a href="/studio/settings" class:active={$page.url.pathname === '/studio/settings'}>
+							<a href="/studio/requests" class:active={$page.url.pathname === '/studio/requests' || $page.url.pathname.startsWith('/studio/requests/')}>
+								<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+									<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+									<polyline points="14 2 14 8 20 8"></polyline>
+									<line x1="16" y1="13" x2="8" y2="13"></line>
+									<line x1="16" y1="17" x2="8" y2="17"></line>
+									<polyline points="10 9 9 9 8 9"></polyline>
+								</svg>
+								<span>Reviews</span>
+							</a>
+							{#if userRole && userRole !== 'viewer'}
+							<a href="/studio/settings" class:active={$page.url.pathname === '/studio/settings' || $page.url.pathname.startsWith('/studio/settings/')}>
 								<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
 									<circle cx="12" cy="12" r="3"></circle>
 									<path d="M12 1v6m0 6v6M5.64 5.64l4.24 4.24m4.24 4.24l4.24 4.24M1 12h6m6 0h6M5.64 18.36l4.24-4.24m4.24-4.24l4.24-4.24"></path>
 								</svg>
 								<span>Settings</span>
 							</a>
+							{/if}
 						</div>
 					</div>
 					<div class="studio-header-right">
@@ -144,6 +184,22 @@
 		<main class="studio-main">
 			{@render children()}
 		</main>
+
+		{#if isAuthenticated && $page.url.pathname !== '/studio/login' && !isStaticBuild && !inIframe}
+			<footer class="studio-footer">
+				<div class="studio-footer-inner">
+					<a href="/" class="studio-footer-home">← Back to site</a>
+					<span class="studio-footer-brand">QCS Studio</span>
+					<span class="studio-footer-tagline">Content &amp; design · Git-native</span>
+					<span class="studio-footer-labs">
+						<a href="/playground" class="studio-footer-lab">Neural</a>
+						<span class="studio-footer-lab-sep">·</span>
+						<a href="/forge" class="studio-footer-lab">Forge</a>
+					</span>
+					<span class="studio-footer-copy">© {new Date().getFullYear()} QuantumCore Solutions</span>
+				</div>
+			</footer>
+		{/if}
 	</div>
 {/if}
 
@@ -154,6 +210,15 @@
 		display: flex;
 		flex-direction: column;
 		padding-top: 0;
+		position: relative;
+	}
+
+	.studio-antigravity-wrap {
+		position: fixed;
+		inset: 0;
+		z-index: 1;
+		pointer-events: none;
+		transform: translateZ(0);
 	}
 
 	/* Studio Header - Single unified header */
@@ -286,7 +351,25 @@
 		transform: translateY(-1px);
 	}
 
+	.studio-layout.studio-embed .studio-main {
+		margin-top: 0;
+		min-height: 100vh;
+		padding: 1.5rem 2rem !important;
+		box-sizing: border-box;
+	}
+
+	.studio-layout.studio-embed .studio-main :global(.menus-settings-page),
+	.studio-layout.studio-embed .studio-main :global(.seo-settings-page),
+	.studio-layout.studio-embed .studio-main :global(.publishing-page),
+	.studio-layout.studio-embed .studio-main :global(.settings-page) {
+		max-width: 100%;
+		padding-left: 0;
+		padding-right: 0;
+	}
+
 	.studio-main {
+		position: relative;
+		z-index: 0;
 		flex: 1;
 		padding: 0;
 		max-width: 1600px;
@@ -345,6 +428,76 @@
 		.studio-main :global(.settings-page),
 		.studio-main :global(.media-page) {
 			padding: 0 5rem;
+		}
+	}
+
+	.studio-footer {
+		margin-top: auto;
+		padding: 1.25rem 2rem;
+		border-top: 1px solid var(--border-subtle);
+		background: rgba(255, 253, 247, 0.8);
+	}
+
+	.studio-footer-inner {
+		max-width: 1600px;
+		margin: 0 auto;
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		justify-content: center;
+		gap: 1rem 1.5rem;
+		font-size: 0.875rem;
+		color: var(--text-secondary);
+	}
+
+	.studio-footer-home {
+		color: var(--text-primary);
+		text-decoration: none;
+		font-weight: 500;
+	}
+
+	.studio-footer-home:hover {
+		color: var(--highlight);
+	}
+
+	.studio-footer-brand {
+		font-weight: 600;
+		color: var(--text-primary);
+	}
+
+	.studio-footer-tagline {
+		color: var(--text-muted);
+	}
+
+	.studio-footer-labs {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.35rem;
+	}
+
+	.studio-footer-lab {
+		color: var(--text-primary);
+		text-decoration: none;
+		font-weight: 500;
+		font-size: 0.875rem;
+	}
+
+	.studio-footer-lab:hover {
+		color: var(--highlight);
+	}
+
+	.studio-footer-lab-sep {
+		color: var(--text-muted);
+		font-size: 0.75rem;
+	}
+
+	.studio-footer-copy {
+		color: var(--text-muted);
+	}
+
+	@media (min-width: 768px) {
+		.studio-footer-inner {
+			justify-content: space-between;
 		}
 	}
 

@@ -9,6 +9,7 @@
 	let selectedCategory = $state<string | null>(null);
 	let isStaticBuild = $state(false);
 	let isAuthenticated = $state(false);
+	let userRole = $state<string | null>(null);
 
 	onMount(async () => {
 		// IMMEDIATELY set loading to false to prevent UI blocking
@@ -26,7 +27,7 @@
 			// Check authentication first
 			try {
 				const authResponse = await fetch('/studio/api/auth/check');
-				const { data: authData, isHtml: authIsHtml } = await safeJsonParse<{ authenticated: boolean }>(authResponse);
+				const { data: authData, isHtml: authIsHtml } = await safeJsonParse<{ authenticated: boolean; role?: string }>(authResponse);
 				
 				if (authIsHtml || !authData?.authenticated) {
 					// Not authenticated, redirect to login
@@ -35,6 +36,7 @@
 				}
 				
 				isAuthenticated = true;
+				userRole = authData.role ?? null;
 			} catch (authError) {
 				// Auth check failed, redirect to login
 				console.warn('Authentication check failed:', authError);
@@ -182,7 +184,13 @@
 				{#if selectedCategory && categories[selectedCategory]}
 					<div class="content-grid">
 						{#each categories[selectedCategory] as file}
-							<div class="content-card" onclick={() => handleEdit(file.slug)}>
+							<div
+								class="content-card"
+								role="button"
+								tabindex="0"
+								onclick={() => handleEdit(file.slug)}
+								onkeydown={(e) => (e.key === 'Enter' || e.key === ' ') && (e.preventDefault(), handleEdit(file.slug))}
+							>
 								<div class="card-header">
 									<h3 class="card-title">{file.title}</h3>
 									<span

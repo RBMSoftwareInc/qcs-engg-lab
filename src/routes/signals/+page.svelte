@@ -17,7 +17,7 @@
 		title: signal.metadata.title,
 		description: signal.metadata.description || '',
 		details: signal.content.substring(0, 200) + '...',
-		image: signal.metadata.image
+		image: signal.metadata.image || '/assets/images/shared/signals-engg.svg'
 	}));
 
 	function handlePreview(slug: string) {
@@ -35,12 +35,17 @@
 </svelte:head>
 
 <Section class="signals-hero">
-	<Reveal>
-		<h1>Signals</h1>
-		<p class="signals-intro">
-			Architecture thinking. Abstract case studies. Real-world implementations. Signals from the field that shape how we engineer systems.
-		</p>
-	</Reveal>
+	<div class="signals-hero-inner">
+		<Reveal>
+			<h1>Signals</h1>
+			<p class="signals-intro">
+				Architecture thinking. Abstract case studies. Real-world implementations. Signals from the field that shape how we engineer systems.
+			</p>
+		</Reveal>
+		<div class="signals-hero-image">
+			<img src="/assets/images/shared/signals-engg.svg" alt="" role="presentation" loading="lazy" />
+		</div>
+	</div>
 </Section>
 
 {#if sliderItems.length > 0}
@@ -86,6 +91,28 @@
 	.signals-hero {
 		text-align: center;
 		padding: 3rem 0 2rem;
+	}
+	.signals-hero-inner {
+		display: grid;
+		grid-template-columns: 1fr;
+		gap: 2rem;
+		align-items: center;
+		max-width: 1000px;
+		margin: 0 auto;
+	}
+	@media (min-width: 768px) {
+		.signals-hero-inner {
+			grid-template-columns: 1fr auto;
+			text-align: left;
+		}
+	}
+	.signals-hero-image {
+		opacity: 0.7;
+	}
+	.signals-hero-image img {
+		max-width: 320px;
+		width: 100%;
+		height: auto;
 	}
 
 	.signals-intro {

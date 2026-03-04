@@ -1,10 +1,9 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { validateSession } from '$lib/studio/auth';
-import { gitStatus } from '$lib/studio/git';
+import { gitStatus, parseStatusPorcelain } from '$lib/studio/git';
 
 export const GET: RequestHandler = async ({ cookies }) => {
-	// Check authentication
 	const sessionCookie = cookies.get('studio_session');
 	if (!sessionCookie) {
 		return json({ error: 'Unauthorized' }, { status: 401 });
@@ -15,15 +14,41 @@ export const GET: RequestHandler = async ({ cookies }) => {
 		if (!validateSession(session)) {
 			return json({ error: 'Unauthorized' }, { status: 401 });
 		}
-	} catch (e) {
+	} catch {
 		return json({ error: 'Unauthorized' }, { status: 401 });
 	}
 
 	try {
 		const result = await gitStatus(process.cwd());
-		return json({ status: result.output || result.message });
-	} catch (error: any) {
-		return json({ status: 'Error: ' + error.message }, { status: 500 });
+		const raw = result.output ?? result.message ?? '';
+		const files = result.success && raw ? parseStatusPorcelain(raw) : [];
+		const byLabel = files.reduce((acc, e) => {
+			acc[e.label] = (acc[e.label] ?? 0) + 1;
+			return acc;
+		}, {} as Record<string, number>);
+		const summaryParts = Object.entries(byLabel).map(([label, n]) => `${n} ${label.toLowerCase()}`);
+		const summary = !result.success
+			? (result.message || result.error || 'Unavailable').split('\n')[0]
+			: summaryParts.length
+				? summaryParts.join(', ')
+				: 'Up to date';
+		return json({
+			success: result.success,
+			status: raw,
+			message: result.message,
+			error: result.error,
+			summary,
+			files
+		});
+	} catch (err: unknown) {
+		return json({
+			success: false,
+			status: '',
+			message: err instanceof Error ? err.message : String(err),
+			error: String(err),
+			summary: 'Error',
+			files: []
+		}, { status: 500 });
 	}
 };
 

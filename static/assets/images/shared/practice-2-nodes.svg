@@ -1,0 +1,12 @@
+<svg width="400" height="280" viewBox="0 0 400 280" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs><style>.e{stroke:#1F2937;stroke-width:1.5;fill:none;opacity:0.5}.n{stroke:#1F2937;stroke-width:2;fill:#FFFDF7}</style></defs>
+  <circle cx="200" cy="100" r="24" class="n"/>
+  <circle cx="120" cy="180" r="16" class="n"/>
+  <circle cx="280" cy="180" r="16" class="n"/>
+  <circle cx="80" cy="140" r="10" class="n"/>
+  <circle cx="320" cy="140" r="10" class="n"/>
+  <line x1="200" y1="124" x2="132" y2="168" class="e"/>
+  <line x1="200" y1="124" x2="268" y2="168" class="e"/>
+  <line x1="120" y1="180" x2="88" y2="148" class="e"/>
+  <line x1="280" y1="180" x2="312" y2="148" class="e"/>
+</svg>

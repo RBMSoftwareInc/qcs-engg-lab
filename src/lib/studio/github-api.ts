@@ -179,6 +179,11 @@ async function githubRequest<T>(
 				errorMessage = errorText || errorMessage;
 			}
 
+			// Clarify auth errors so users know it's GitHub token/config, not Studio login
+			if (response.status === 401 || (errorMessage && errorMessage.toLowerCase().includes('bad credentials'))) {
+				errorMessage = 'GitHub token invalid or expired. Set GITHUB_TOKEN in your server environment (e.g. .env) with repo scope and push access.';
+			}
+
 			// Handle GitHub's actual rate limiting
 			const rateLimitRemaining = response.headers.get('x-ratelimit-remaining');
 			const rateLimitReset = response.headers.get('x-ratelimit-reset');
@@ -409,6 +414,83 @@ export async function deleteFile(
 	return {
 		success: true,
 		data: result.data.commit
+	};
+}
+
+/**
+ * List commits that modified a specific file (for revision history)
+ * https://docs.github.com/en/rest/commits/commits#list-commits
+ */
+export interface CommitForFile {
+	sha: string;
+	message: string;
+	authorName: string;
+	authorEmail: string;
+	date: string;
+	url: string;
+}
+
+export async function listCommitsForFile(
+	filePath: string,
+	perPage: number = 30
+): Promise<GitHubApiResult<CommitForFile[]>> {
+	const config = getGitHubConfig();
+	const encodedPath = encodeURIComponent(filePath);
+	const result = await githubRequest<Array<{
+		sha: string;
+		commit: { message: string; author: { name: string; email: string; date: string } };
+		html_url: string;
+	}>>(`/commits?path=${encodedPath}&sha=${config.branch}&per_page=${perPage}`);
+
+	if (!result.success || !result.data) {
+		return result as GitHubApiResult<CommitForFile[]>;
+	}
+
+	return {
+		success: true,
+		data: result.data.map((c) => ({
+			sha: c.sha,
+			message: c.commit.message.split('\n')[0] || '',
+			authorName: c.commit.author?.name || '',
+			authorEmail: c.commit.author?.email || '',
+			date: c.commit.author?.date || '',
+			url: c.html_url || ''
+		}))
+	};
+}
+
+/**
+ * Get file content at a specific commit ref (for restore)
+ */
+export async function getFileContentAtRef(
+	filePath: string,
+	ref: string
+): Promise<GitHubApiResult<{ content: string; sha: string }>> {
+	const encodedPath = encodeURIComponent(filePath);
+	const result = await githubRequest<GitHubFile>(`/contents/${encodedPath}?ref=${ref}`);
+
+	if (!result.success || !result.data) {
+		return result as GitHubApiResult<{ content: string; sha: string }>;
+	}
+
+	let content = '';
+	if (result.data.content) {
+		try {
+			content = Buffer.from(result.data.content, 'base64').toString('utf-8');
+		} catch (error: any) {
+			return {
+				success: false,
+				error: `Failed to decode file content: ${error.message}`
+			};
+		}
+	}
+
+	return {
+		success: true,
+		data: {
+			content,
+			sha: result.data.sha
+		}
 	};
 }
 

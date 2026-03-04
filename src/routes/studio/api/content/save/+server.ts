@@ -1,28 +1,33 @@
 import { json } from '@sveltejs/kit';
+import { readFileSync, existsSync } from 'fs';
+import { join } from 'path';
 import type { RequestHandler } from './$types';
-import { validateSession } from '$lib/studio/auth';
-import { 
-	createOrUpdateFile, 
+import { parseSession, requireEditor } from '$lib/studio/auth';
+import {
+	createOrUpdateFile,
 	getFileContent,
-	getSafeContentPath, 
-	validateContentPath 
+	getSafeContentPath,
+	validateContentPath
 } from '$lib/studio/github-api';
 import { validateMarkdown, validateFilePath, validateCommitMessage } from '$lib/studio/validators';
 
-export const POST: RequestHandler = async ({ request, cookies }) => {
-	// Check authentication
-	const sessionCookie = cookies.get('studio_session');
-	if (!sessionCookie) {
-		return json({ success: false, message: 'Unauthorized' }, { status: 401 });
-	}
+const STUDIO_CONFIG_PATH = 'config/studio.json';
 
+function getPublishWebhookUrl(): string {
 	try {
-		const session = JSON.parse(sessionCookie);
-		if (!validateSession(session)) {
-			return json({ success: false, message: 'Unauthorized' }, { status: 401 });
-		}
-	} catch (e) {
-		return json({ success: false, message: 'Unauthorized' }, { status: 401 });
+		if (!existsSync(join(process.cwd(), STUDIO_CONFIG_PATH))) return '';
+		const raw = readFileSync(join(process.cwd(), STUDIO_CONFIG_PATH), 'utf-8');
+		const data = JSON.parse(raw) as { publishWebhookUrl?: string };
+		return typeof data.publishWebhookUrl === 'string' ? data.publishWebhookUrl.trim() : '';
+	} catch {
+		return '';
+	}
+}
+
+export const POST: RequestHandler = async ({ request, cookies }) => {
+	const session = parseSession(cookies.get('studio_session'));
+	if (!requireEditor(session)) {
+		return json({ success: false, message: 'Editor or Admin role required to save content' }, { status: 403 });
 	}
 
 	try {
@@ -91,8 +96,12 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 		);
 
 		if (result.success) {
-			return json({ 
-				success: true, 
+			const webhookUrl = getPublishWebhookUrl();
+			if (webhookUrl) {
+				fetch(webhookUrl, { method: 'POST' }).catch(() => {});
+			}
+			return json({
+				success: true,
 				message: 'Content saved and committed to GitHub',
 				commit: result.data
 			});

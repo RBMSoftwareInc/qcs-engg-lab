@@ -1,6 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
 
 :root {
+  /* Base theme (design skins can override via design/skins/*.css) */
   --bg-primary: #FFFDF7;        /* creamy white */
   --bg-secondary: #FFF6DB;      /* light mango */
   --bg-accent: #FFE8A3;         /* subliminal yellow */
@@ -13,6 +14,11 @@
   --grid-overlay: rgba(0, 0, 0, 0.03);
 
   --highlight: #F4C430;         /* mango highlight */
+
+  /* Fonts (design skins can set --font-body, --font-heading, --font-mono) */
+  --font-body: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-heading: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'IBM Plex Mono', 'Courier New', monospace;
 }
 
 * {
@@ -41,7 +47,7 @@ html {
 }
 
 body {
-  font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: var(--font-body);
   font-weight: 400;
   line-height: 1.6;
   color: var(--text-primary);
@@ -54,9 +60,14 @@ body {
   letter-spacing: -0.01em;
 }
 
+/* Studio routes: single header (no main site nav), no extra top padding */
+body.studio-routes {
+  padding-top: 0;
+}
+
 code,
 pre {
-  font-family: 'IBM Plex Mono', 'Courier New', monospace;
+  font-family: var(--font-mono);
   font-size: 0.9em;
 }
 
@@ -201,6 +212,32 @@ button:not(:disabled):hover {
 
 button:not(:disabled):active {
   transform: translateY(0);
+}
+
+/* Article / long-form readability */
+.content-wrapper,
+.article-body {
+  max-width: 72ch;
+  line-height: 1.75;
+}
+
+.content-wrapper h2,
+.article-body h2 {
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.35rem;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.content-wrapper h2:first-child,
+.article-body h2:first-child {
+  margin-top: 0;
+}
+
+.content-wrapper h3,
+.article-body h3 {
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
 }
 
 /* Reduced motion overrides */
