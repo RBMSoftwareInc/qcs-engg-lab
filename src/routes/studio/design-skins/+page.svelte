@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { safeJsonParse, checkApiAvailable } from '$lib/studio/api-utils';
+	import { SKIN_PRESETS } from '$lib/studio/design-skin-presets';
 
 	interface DesignSkin {
 		name: string;
@@ -22,6 +23,14 @@
 	let createTokens = $state('{}');
 	let createLoading = $state(false);
 	let error = $state<string | null>(null);
+
+	function openCreateFromPreset(presetId: string) {
+		const preset = SKIN_PRESETS.find((p) => p.id === presetId);
+		if (!preset) return;
+		createName = preset.id;
+		createTokens = JSON.stringify(preset.tokens, null, 2);
+		showCreateModal = true;
+	}
 
 	onMount(async () => {
 		loading = false;
@@ -194,8 +203,8 @@
 			<div>
 				<h1>Design Skins</h1>
 				<p class="page-description">
-					Manage design tokens and skins. Import from Figma or create manually.
-					Skins are committed to Git and applied at build time.
+					Manage design tokens and skins. Use a preset, import from Figma, or create manually.
+					The active skin is applied to the live site (fonts, colors, spacing).
 				</p>
 			</div>
 			<div class="header-actions">
@@ -221,20 +230,39 @@
 			<p>{error}</p>
 			<button onclick={() => { error = null; loadSkins(); }}>Retry</button>
 		</div>
-	{:else if skins.length === 0}
+	{:else}
+		<div class="presets-section">
+			<h2 class="presets-heading">Start from a preset</h2>
+			<p class="presets-description">Create a new skin from a predefined theme (fonts, colors). You can edit the tokens before saving.</p>
+			<div class="presets-grid">
+				{#each SKIN_PRESETS as preset}
+					<button
+						type="button"
+						class="preset-card"
+						onclick={() => openCreateFromPreset(preset.id)}
+						title={preset.description}
+					>
+						<span class="preset-label">{preset.label}</span>
+						<span class="preset-desc">{preset.description}</span>
+					</button>
+				{/each}
+			</div>
+		</div>
+
+		{#if skins.length === 0}
 		<div class="empty-state">
 			<p>No design skins found.</p>
-			<p class="empty-hint">Create a skin manually or import from Figma to get started.</p>
+			<p class="empty-hint">Use a preset above, create manually, or import from Figma.</p>
 			<div class="empty-actions">
 				<button class="btn-secondary" onclick={() => showImportModal = true}>
 					Import from Figma
 				</button>
 				<button class="btn-primary" onclick={() => showCreateModal = true}>
-					Create First Skin
+					Create Skin Manually
 				</button>
 			</div>
 		</div>
-	{:else}
+		{:else}
 		<div class="skins-grid">
 			{#each skins as skin}
 				<div class="skin-card" class:active={activeSkin === skin.name}>
@@ -275,13 +303,28 @@
 				</div>
 			{/each}
 		</div>
+		{/if}
 	{/if}
 </div>
 
 <!-- Figma Import Modal -->
 {#if showImportModal}
-	<div class="modal-overlay" onclick={() => showImportModal = false}>
-		<div class="modal" onclick={(e) => e.stopPropagation()}>
+	<div
+		class="modal-overlay"
+		role="button"
+		tabindex="0"
+		onclick={() => showImportModal = false}
+		onkeydown={(e) => (e.key === 'Enter' || e.key === ' ') && (e.preventDefault(), showImportModal = false)}
+	>
+		<div
+			class="modal"
+			role="dialog"
+			aria-modal="true"
+			aria-label="Import from Figma"
+			tabindex="-1"
+			onclick={(e) => e.stopPropagation()}
+			onkeydown={(e) => e.stopPropagation()}
+		>
 			<div class="modal-header">
 				<h2>Import from Figma</h2>
 				<button class="modal-close" onclick={() => showImportModal = false}>×</button>
@@ -330,8 +373,22 @@
 
 <!-- Create Skin Modal -->
 {#if showCreateModal}
-	<div class="modal-overlay" onclick={() => showCreateModal = false}>
-		<div class="modal modal-large" onclick={(e) => e.stopPropagation()}>
+	<div
+		class="modal-overlay"
+		role="button"
+		tabindex="0"
+		onclick={() => showCreateModal = false}
+		onkeydown={(e) => (e.key === 'Enter' || e.key === ' ') && (e.preventDefault(), showCreateModal = false)}
+	>
+		<div
+			class="modal modal-large"
+			role="dialog"
+			aria-modal="true"
+			aria-label="Create Design Skin"
+			tabindex="-1"
+			onclick={(e) => e.stopPropagation()}
+			onkeydown={(e) => e.stopPropagation()}
+		>
 			<div class="modal-header">
 				<h2>Create Design Skin</h2>
 				<button class="modal-close" onclick={() => showCreateModal = false}>×</button>
@@ -491,6 +548,56 @@
 		display: flex;
 		gap: 1rem;
 		justify-content: center;
+	}
+
+	.presets-section {
+		margin-bottom: 2.5rem;
+		padding-bottom: 2rem;
+		border-bottom: 1px solid var(--border-subtle);
+	}
+	.presets-heading {
+		font-size: 1.1rem;
+		font-weight: 600;
+		margin: 0 0 0.35rem 0;
+		color: var(--text-primary);
+	}
+	.presets-description {
+		font-size: 0.9rem;
+		color: var(--text-secondary);
+		margin: 0 0 1rem 0;
+	}
+	.presets-grid {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.75rem;
+	}
+	.preset-card {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		text-align: left;
+		padding: 0.75rem 1rem;
+		background: var(--bg-secondary);
+		border: 1px solid var(--border-subtle);
+		border-radius: 8px;
+		cursor: pointer;
+		transition: border-color 0.2s, background 0.2s;
+		max-width: 280px;
+	}
+	.preset-card:hover {
+		border-color: var(--highlight);
+		background: var(--bg-accent, rgba(244, 196, 48, 0.08));
+	}
+	.preset-label {
+		font-weight: 600;
+		font-size: 0.95rem;
+		color: var(--text-primary);
+	}
+	.preset-desc {
+		font-size: 0.8rem;
+		color: var(--text-muted);
+		margin-top: 0.25rem;
+		line-height: 1.3;
 	}
 
 	.skins-grid {

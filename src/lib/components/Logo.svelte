@@ -52,10 +52,12 @@
 	
 	{#if showText && (variant === 'full' || variant === 'wordmark')}
 		<div class="logo-text">
-			<span class="logo-primary">QuantumCore</span>
-			<span class="logo-secondary">Solutions</span>
+			<div class="logo-name">
+				<span class="logo-primary">QuantumCore</span>
+				<span class="logo-secondary">Solutions</span>
+			</div>
 			{#if variant === 'full'}
-				<span class="logo-tagline">Innovate | Shape | Thrive</span>
+				<span class="logo-tagline">Innovate · Shape · Thrive</span>
 			{/if}
 		</div>
 	{/if}
@@ -65,7 +67,7 @@
 	.logo-container {
 		display: flex;
 		align-items: center;
-		gap: 0.75rem;
+		gap: 0.875rem;
 	}
 
 	.logo-svg {
@@ -82,33 +84,39 @@
 	.logo-text {
 		display: flex;
 		flex-direction: column;
-		line-height: 1.1;
+		gap: 0.375rem;
+		justify-content: center;
+	}
+
+	.logo-name {
+		display: flex;
+		flex-direction: column;
+		gap: 0.125rem;
+		line-height: 1.2;
 	}
 
 	.logo-primary {
-		font-size: 1.15rem;
+		font-size: 1.2rem;
 		font-weight: 600;
-		letter-spacing: -0.03em;
+		letter-spacing: -0.025em;
 		color: var(--text-primary);
 	}
 
 	.logo-secondary {
-		font-size: 0.75rem;
-		font-weight: 400;
-		letter-spacing: 0.05em;
+		font-size: 0.7rem;
+		font-weight: 500;
+		letter-spacing: 0.12em;
 		text-transform: uppercase;
-		color: var(--text-secondary);
-		margin-top: -2px;
+		color: var(--text-muted);
 	}
 
 	.logo-tagline {
-		font-size: 0.65rem;
+		font-size: 0.6rem;
 		font-weight: 500;
-		letter-spacing: 0.08em;
+		letter-spacing: 0.14em;
 		text-transform: uppercase;
 		color: var(--highlight);
-		margin-top: 4px;
-		opacity: 0.9;
+		opacity: 0.95;
 	}
 
 	@media (max-width: 640px) {

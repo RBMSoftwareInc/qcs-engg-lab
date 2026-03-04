@@ -1,0 +1,22 @@
+{
+  "blocks": [
+    {
+      "id": "hero",
+      "name": "Hero Layout",
+      "description": "Full-width hero section with title, subtitle, and optional image",
+      "component": "HeroLayout"
+    },
+    {
+      "id": "article",
+      "name": "Article Layout",
+      "description": "Standard article layout with title, metadata, and content",
+      "component": "ArticleLayout"
+    },
+    {
+      "id": "card",
+      "name": "Card Layout",
+      "description": "Card component with title, description, and optional image",
+      "component": "CardLayout"
+    }
+  ]
+}

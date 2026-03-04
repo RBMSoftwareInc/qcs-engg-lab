@@ -2,18 +2,42 @@
 	import Section from '$lib/components/Section.svelte';
 	import MarkdownBlock from '$lib/components/MarkdownBlock.svelte';
 	import Reveal from '$lib/components/Reveal.svelte';
+	import OnThisPage from '$lib/components/OnThisPage.svelte';
+	import RelatedLinks from '$lib/components/RelatedLinks.svelte';
 	import { loadContentByDirectory, loadContentBySlug } from '$lib/content/loader';
 	import { page } from '$app/stores';
 
+	const PRACTICE_IMAGES = [
+		'/assets/images/shared/practice-1-layers.svg',
+		'/assets/images/shared/practice-2-nodes.svg',
+		'/assets/images/shared/practice-3-pipeline.svg',
+		'/assets/images/shared/practice-4-grid.svg',
+		'/assets/images/shared/practice-5-modules.svg',
+		'/assets/images/shared/practice-6-radial.svg'
+	];
+	function getPracticeImageForSlug(metadata: { diagram?: string; image?: string }, slug: string) {
+		return metadata.diagram || metadata.image || PRACTICE_IMAGES[slug.split('').reduce((a, c) => a + c.charCodeAt(0), 0) % PRACTICE_IMAGES.length];
+	}
+
 	let practiceItem: any = null;
+	let allPracticeItems: { slug: string; metadata: { title: string } }[] = [];
+	let prevNext = $derived.by(() => {
+		if (!practiceItem?.slug) return { prev: null, next: null };
+		const idx = allPracticeItems.findIndex((a) => a.slug === practiceItem.slug);
+		if (idx < 0) return { prev: null, next: null };
+		return {
+			prev: idx > 0 ? { title: allPracticeItems[idx - 1].metadata.title, href: `/practice/${allPracticeItems[idx - 1].slug}` } : null,
+			next: idx < allPracticeItems.length - 1 ? { title: allPracticeItems[idx + 1].metadata.title, href: `/practice/${allPracticeItems[idx + 1].slug}` } : null
+		};
+	});
 
 	$: {
 		const slug = $page.params.slug;
-		// Search across both domains and services
 		const domains = loadContentByDirectory('domains');
 		const services = loadContentByDirectory('services');
-		const allItems = [...domains, ...services];
-		practiceItem = allItems.find(item => item.slug === slug) || loadContentBySlug(slug);
+		const allItems = [...(domains || []), ...(services || [])].sort((a, b) => (a.metadata.order ?? 999) - (b.metadata.order ?? 999));
+		allPracticeItems = allItems;
+		practiceItem = allItems.find((item: any) => item.slug === slug) || loadContentBySlug(slug);
 	}
 </script>
 
@@ -28,24 +52,13 @@
 			<a href="/practice" class="back-link">← Practice</a>
 		</Reveal>
 		<div class="practice-header">
-			{#if practiceItem.metadata.diagram || practiceItem.metadata.image}
-				<div class="practice-hero-image">
-					<img
-						src={practiceItem.metadata.diagram || practiceItem.metadata.image}
-						alt={practiceItem.metadata.title}
-						loading="eager"
-					/>
-				</div>
-			{:else}
-				<div class="practice-image-placeholder">
-					<svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-						<rect x="20" y="20" width="160" height="160" stroke="currentColor" stroke-width="3" stroke-dasharray="8 8" fill="none" opacity="0.3" />
-						<circle cx="100" cy="100" r="40" fill="currentColor" opacity="0.2" />
-						<path d="M60 60L140 140M140 60L60 140" stroke="currentColor" stroke-width="2" opacity="0.3" />
-					</svg>
-					<span>Image Placeholder</span>
-				</div>
-			{/if}
+			<div class="practice-hero-image">
+				<img
+					src={getPracticeImageForSlug(practiceItem.metadata, practiceItem.slug)}
+					alt={practiceItem.metadata.title}
+					loading="eager"
+				/>
+			</div>
 			<div class="practice-header-content">
 				<Reveal delay={0.1}>
 					<h1>{practiceItem.metadata.title}</h1>
@@ -61,8 +74,21 @@
 
 	<Section class="practice-content">
 		<Reveal delay={0.2}>
-			<div class="content-wrapper">
-				<MarkdownBlock html={practiceItem.html} />
+			<div class="practice-layout">
+				<div class="practice-main">
+					<div class="content-wrapper">
+						<MarkdownBlock html={practiceItem.html} />
+					</div>
+					<RelatedLinks
+						prev={prevNext.prev}
+						next={prevNext.next}
+						backHref="/practice"
+						backLabel="All Practice"
+					/>
+				</div>
+				<aside class="practice-sidebar">
+					<OnThisPage selector=".practice-main" headingTag="h2" />
+				</aside>
 			</div>
 		</Reveal>
 	</Section>
@@ -99,6 +125,26 @@
 		grid-template-columns: 1fr;
 		gap: 3rem;
 		align-items: center;
+	}
+
+	.practice-layout {
+		display: grid;
+		grid-template-columns: 1fr;
+		gap: 3rem;
+	}
+
+	@media (min-width: 1024px) {
+		.practice-layout {
+			grid-template-columns: 1fr 200px;
+		}
+
+		.practice-sidebar {
+			order: 2;
+		}
+	}
+
+	.practice-main {
+		min-width: 0;
 	}
 
 	@media (min-width: 768px) {

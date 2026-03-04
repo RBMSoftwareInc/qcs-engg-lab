@@ -1,6 +1,6 @@
 import { json, text } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { validateSession } from '$lib/studio/auth';
+import { parseSession, validateSession } from '$lib/studio/auth';
 import { getFileContent } from '$lib/studio/github-api';
 
 /**
@@ -8,17 +8,8 @@ import { getFileContent } from '$lib/studio/github-api';
  * Get CSS file for a design skin
  */
 export const GET: RequestHandler = async ({ params, cookies }) => {
-	const sessionCookie = cookies.get('studio_session');
-	if (!sessionCookie) {
-		return text('Unauthorized', { status: 401 });
-	}
-
-	try {
-		const session = JSON.parse(sessionCookie);
-		if (!validateSession(session)) {
-			return text('Unauthorized', { status: 401 });
-		}
-	} catch (e) {
+	const session = parseSession(cookies.get('studio_session'));
+	if (!validateSession(session)) {
 		return text('Unauthorized', { status: 401 });
 	}
 

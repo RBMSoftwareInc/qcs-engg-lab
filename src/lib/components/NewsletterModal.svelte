@@ -6,22 +6,36 @@
 	let email = $state('');
 	let isSubmitting = $state(false);
 	let isSubmitted = $state(false);
+	let error = $state('');
 
-	function handleSubmit(e: Event) {
+	async function handleSubmit(e: Event) {
 		e.preventDefault();
 		if (!email || !email.includes('@')) return;
 
+		error = '';
 		isSubmitting = true;
-		// Simulate API call
-		setTimeout(() => {
+		try {
+			const res = await fetch('/api/newsletter', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ email })
+			});
+			const data = await res.json().catch(() => ({}));
+			if (res.ok && data.success) {
+				isSubmitted = true;
+				setTimeout(() => {
+					open = false;
+					isSubmitted = false;
+					email = '';
+				}, 2500);
+			} else {
+				error = data.message || 'Subscription failed. Please try again.';
+			}
+		} catch (_) {
+			error = 'Network error. Please try again.';
+		} finally {
 			isSubmitting = false;
-			isSubmitted = true;
-			setTimeout(() => {
-				open = false;
-				isSubmitted = false;
-				email = '';
-			}, 2000);
-		}, 1000);
+		}
 	}
 
 	function handleBackdropClick(e: MouseEvent) {
@@ -68,9 +82,9 @@
 							autocomplete="email"
 						/>
 					</div>
-
+					{#if error}<div class="form-error" role="alert">{error}</div>{/if}
 					<button type="submit" class="submit-btn" disabled={isSubmitting}>
-						{isSubmitting ? 'Subscribing...' : 'Subscribe'}
+						{isSubmitting ? 'Subscribing…' : 'Subscribe'}
 					</button>
 				</form>
 			{/if}
@@ -206,6 +220,11 @@
 	.submit-btn:disabled {
 		opacity: 0.6;
 		cursor: not-allowed;
+	}
+
+	.form-error {
+		color: var(--error, #dc2626);
+		font-size: 0.9rem;
 	}
 
 	.success-message {

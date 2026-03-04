@@ -1,8 +1,17 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 
-	let { open = $bindable(false) } = $props<{
+	/** Optional copy from Studio Data Forms config (inquiries: label, submitText, successMessage, fields) */
+	export type ConversationModalCopy = {
+		label?: string;
+		submitText?: string;
+		successMessage?: string;
+		fields?: Record<string, { label?: string; placeholder?: string }>;
+	};
+
+	let { open = $bindable(false), copy } = $props<{
 		open?: boolean;
+		copy?: ConversationModalCopy;
 	}>();
 
 	let formRef: HTMLFormElement;
@@ -11,6 +20,9 @@
 	let intentRef: HTMLTextAreaElement;
 	let prefersReducedMotion = $state(false);
 	let isAnimating = $state(false);
+	let isSubmitting = $state(false);
+	let isSubmitted = $state(false);
+	let error = $state('');
 
 	onMount(() => {
 		prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -22,11 +34,37 @@
 		}
 	}
 
-	function handleSubmit(e: Event) {
+	async function handleSubmit(e: Event) {
 		e.preventDefault();
-		// Handle form submission here
-		console.log('Form submitted');
-		open = false;
+		const name = nameRef?.value?.trim() ?? '';
+		const email = emailRef?.value?.trim() ?? '';
+		const intent = intentRef?.value?.trim() ?? '';
+		if (!name || !email || !intent) return;
+
+		error = '';
+		isSubmitting = true;
+		try {
+			const res = await fetch('/api/inquiries', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ name, email, intent })
+			});
+			const data = await res.json().catch(() => ({}));
+			if (res.ok && data.success) {
+				isSubmitted = true;
+				formRef?.reset();
+				setTimeout(() => {
+					open = false;
+					isSubmitted = false;
+				}, 2500);
+			} else {
+				error = data.message || 'Something went wrong. Please try again.';
+			}
+		} catch (_) {
+			error = 'Network error. Please try again.';
+		} finally {
+			isSubmitting = false;
+		}
 	}
 
 	function handleBackdropClick(e: MouseEvent) {
@@ -49,6 +87,11 @@
 			document.body.style.overflow = '';
 		};
 	});
+
+	const title = $derived(copy?.label ?? "Let's Get Started");
+	const submitLabel = $derived(copy?.submitText ?? 'Proceed');
+	const successText = $derived(copy?.successMessage ?? "We've received your message and will get back to you soon.");
+	const field = (name: string, kind: 'label' | 'placeholder') => copy?.fields?.[name]?.[kind];
 </script>
 
 <svelte:window onkeydown={handleKeydown} />
@@ -74,15 +117,26 @@
 				</svg>
 			</button>
 
-			<h2 id="modal-title" class="modal-title">Let's Get Started</h2>
-			<p class="modal-intro">
-				Custom software crafted for your sustainable success.<br />
-				Tell us about your project and we'll get back to you.
-			</p>
+			<h2 id="modal-title" class="modal-title">{title}</h2>
 
-			<form bind:this={formRef} onsubmit={handleSubmit} class="modal-form">
+			{#if isSubmitted}
+				<div class="success-message">
+					<svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+						<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+						<polyline points="22 4 12 14.01 9 11.01" />
+					</svg>
+					<p class="success-title">Thank you</p>
+					<p class="success-text">{successText}</p>
+				</div>
+			{:else}
+				<p class="modal-intro">
+					Custom software crafted for your sustainable success.<br />
+					Tell us about your project and we'll get back to you.
+				</p>
+
+				<form bind:this={formRef} onsubmit={handleSubmit} class="modal-form">
 				<div class="form-group">
-					<label for="name">Name</label>
+					<label for="name">{field('name', 'label') ?? 'Name'}</label>
 					<input
 						type="text"
 						id="name"
@@ -90,11 +144,12 @@
 						bind:this={nameRef}
 						required
 						autocomplete="name"
+						placeholder={field('name', 'placeholder') ?? ''}
 					/>
 				</div>
 
 				<div class="form-group">
-					<label for="email">Email</label>
+					<label for="email">{field('email', 'label') ?? 'Email'}</label>
 					<input
 						type="email"
 						id="email"
@@ -102,23 +157,30 @@
 						bind:this={emailRef}
 						required
 						autocomplete="email"
+						placeholder={field('email', 'placeholder') ?? ''}
 					/>
 				</div>
 
 				<div class="form-group">
-					<label for="intent">What brings you here?</label>
+					<label for="intent">{field('intent', 'label') ?? 'What brings you here?'}</label>
 					<textarea
 						id="intent"
 						name="intent"
 						bind:this={intentRef}
 						rows="4"
 						required
-						placeholder="Share your intent..."
+						placeholder={field('intent', 'placeholder') ?? 'Share your intent...'}
 					></textarea>
 				</div>
 
-				<button type="submit" class="form-submit">Proceed</button>
+					{#if error}
+						<div class="form-error" role="alert">{error}</div>
+					{/if}
+				<button type="submit" class="form-submit" disabled={isSubmitting}>
+					{isSubmitting ? 'Sending…' : submitLabel}
+				</button>
 			</form>
+			{/if}
 		</div>
 	</div>
 {/if}
@@ -262,6 +324,39 @@
 	.form-submit:focus {
 		outline: 2px solid var(--highlight);
 		outline-offset: 2px;
+	}
+
+	.form-submit:disabled {
+		opacity: 0.7;
+		cursor: not-allowed;
+		transform: none;
+	}
+
+	.form-error {
+		color: var(--error, #dc2626);
+		font-size: 0.9rem;
+		margin-top: -0.5rem;
+	}
+
+	.success-message {
+		text-align: center;
+		padding: 2rem 0;
+	}
+
+	.success-message svg {
+		color: var(--highlight, #22c55e);
+		margin-bottom: 1rem;
+	}
+
+	.success-title {
+		font-size: 1.5rem;
+		font-weight: 600;
+		margin-bottom: 0.5rem;
+	}
+
+	.success-text {
+		color: var(--text-secondary);
+		line-height: 1.6;
 	}
 
 	@media (prefers-reduced-motion: reduce) {

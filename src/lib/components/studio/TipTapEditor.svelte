@@ -6,6 +6,7 @@
 	import Link from '@tiptap/extension-link';
 	import Placeholder from '@tiptap/extension-placeholder';
 	import Typography from '@tiptap/extension-typography';
+	import { marked } from 'marked';
 	import { tiptapToMarkdown } from '$lib/studio/markdown-serializer';
 	import { markdownToTiptap } from '$lib/studio/markdown-parser';
 
@@ -160,6 +161,46 @@
 
 	function redo() {
 		editor?.chain().focus().redo().run();
+	}
+
+	/** Get current markdown (for AI / parent). */
+	export function getMarkdown(): string {
+		if (!editor) return '';
+		return tiptapToMarkdown(editor.getJSON());
+	}
+
+	/** Get currently selected text. */
+	export function getSelectedText(): string {
+		if (!editor) return '';
+		const { from, to } = editor.state.selection;
+		return editor.state.doc.textBetween(from, to, '\n');
+	}
+
+	/** Insert markdown at the end of the document. */
+	export function insertAtEnd(markdown: string): void {
+		if (!editor || !markdown.trim()) return;
+		try {
+			const html = marked.parse('\n\n' + markdown.trim()) as string;
+			const end = editor.state.doc.content.size;
+			editor.chain().focus().insertContentAt(end, html).run();
+			onUpdate?.(tiptapToMarkdown(editor.getJSON()));
+		} catch {
+			editor.chain().focus().insertContentAt(editor.state.doc.content.size, { type: 'paragraph', content: [{ type: 'text', text: markdown.trim() }] }).run();
+			onUpdate?.(tiptapToMarkdown(editor.getJSON()));
+		}
+	}
+
+	/** Replace current selection with markdown (or insert at cursor if no selection). */
+	export function replaceSelection(markdown: string): void {
+		if (!editor || !markdown.trim()) return;
+		try {
+			const html = marked.parse(markdown.trim()) as string;
+			editor.chain().focus().deleteSelection().insertContent(html).run();
+			onUpdate?.(tiptapToMarkdown(editor.getJSON()));
+		} catch {
+			editor.chain().focus().deleteSelection().insertContent({ type: 'paragraph', content: [{ type: 'text', text: markdown.trim() }] }).run();
+			onUpdate?.(tiptapToMarkdown(editor.getJSON()));
+		}
 	}
 </script>
 

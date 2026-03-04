@@ -1,6 +1,6 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { validateCredentials, createSession } from '$lib/studio/auth';
+import { validateCredentials, createSession, getRoleForEmail } from '$lib/studio/auth';
 
 export const POST: RequestHandler = async ({ request, cookies }) => {
 	try {
@@ -11,7 +11,8 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 		}
 
 		if (validateCredentials(email, password)) {
-			const session = createSession(email);
+			const role = getRoleForEmail(email) ?? 'admin';
+			const session = createSession(email, role);
 			cookies.set('studio_session', JSON.stringify(session), {
 				path: '/',
 				httpOnly: true,

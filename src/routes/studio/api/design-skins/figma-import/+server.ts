@@ -1,6 +1,6 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { validateSession } from '$lib/studio/auth';
+import { parseSession, requireAdmin } from '$lib/studio/auth';
 import { importFigmaTokens } from '$lib/studio/figma-api';
 import { validateTokens } from '$lib/studio/design-tokens';
 import { createOrUpdateFile, getFileContent } from '$lib/studio/github-api';
@@ -11,18 +11,9 @@ import { tokensToCSS } from '$lib/studio/design-tokens';
  * Import design tokens from Figma and create a skin
  */
 export const POST: RequestHandler = async ({ request, cookies }) => {
-	const sessionCookie = cookies.get('studio_session');
-	if (!sessionCookie) {
-		return json({ success: false, message: 'Unauthorized' }, { status: 401 });
-	}
-
-	try {
-		const session = JSON.parse(sessionCookie);
-		if (!validateSession(session)) {
-			return json({ success: false, message: 'Unauthorized' }, { status: 401 });
-		}
-	} catch (e) {
-		return json({ success: false, message: 'Unauthorized' }, { status: 401 });
+	const session = parseSession(cookies.get('studio_session'));
+	if (!requireAdmin(session)) {
+		return json({ success: false, message: 'Admin only' }, { status: 403 });
 	}
 
 	try {

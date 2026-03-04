@@ -13,6 +13,16 @@ This folder contains all documentation for the QCS Engineering Lab project.
 
 ### Core Features
 - **[STUDIO_EXTENSION_SUMMARY.md](./STUDIO_EXTENSION_SUMMARY.md)** – Complete feature implementation summary
+- **[STUDIO_PERMISSIONS_AND_FEATURES.md](./STUDIO_PERMISSIONS_AND_FEATURES.md)** – Permissions matrix, revision history, scheduled publish, block registry
+- **[STUDIO_SCREENS_AND_WORKFLOW.md](./STUDIO_SCREENS_AND_WORKFLOW.md)** – Where to find features, scheduled-publish workflow, optional screens
+- **[PRODUCT_HOW_TO_START_A_SITE.md](./PRODUCT_HOW_TO_START_A_SITE.md)** – How to start a new website (sellable product), Studio as front face, initiation flow
+- **[STUDIO_GENERALIZED_MULTI_CUSTOMER.md](./STUDIO_GENERALIZED_MULTI_CUSTOMER.md)** – Studio for multiple customers (e.g. XYZ), one vs many repos, one vs many deployments, practical issues, strategy
+- **[PRODUCT_RELEASE_AND_ARCH.md](./PRODUCT_RELEASE_AND_ARCH.md)** – Product release readiness, optional arch changes, building many websites
+- **[GIT_NATIVE_MARKET_AND_SELLABILITY.md](./GIT_NATIVE_MARKET_AND_SELLABILITY.md)** – Git-native CMS market, competitors, sellability, what others lack
+- **[WHY_OURS_STAND_OUT_AI.md](./WHY_OURS_STAND_OUT_AI.md)** – Why buy ours, what stands out, AI features to make it special and viable
+- **[CONSOLIDATED_AI_PLUGINS_FORMS_MCP.md](./CONSOLIDATED_AI_PLUGINS_FORMS_MCP.md)** – Single reference: AI feature list, plugin compatibility, pre-built forms/fragments, MCP and LLM switching
+- **[DESIGN_SKINS_AND_FONTS.md](./DESIGN_SKINS_AND_FONTS.md)** – Global fonts, design skins, predefined presets, applying active skin to the website
+- **[GIT_FEATURES_MATRIX.md](./GIT_FEATURES_MATRIX.md)** – Matrix: Git features ↔ portal use ↔ website-building potential
 - **[CONTENT_SYSTEM.md](./CONTENT_SYSTEM.md)** – Content system architecture and usage
 - **[README_MDX.md](./README_MDX.md)** – MDX content system quick reference
 

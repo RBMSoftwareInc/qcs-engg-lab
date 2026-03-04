@@ -1,0 +1,36 @@
+{
+  "title": "Home",
+  "slug": "home",
+  "description": "Block-built homepage",
+  "blocks": [
+    {
+      "id": "hero-1",
+      "type": "hero",
+      "props": {
+        "title": "Welcome to the block builder",
+        "subtitle": "Drag, drop, and design your page.",
+        "tagline": "Fully flexible. Git-native.",
+        "ctaText": "Get started",
+        "ctaLink": "#"
+      }
+    },
+    {
+      "id": "text-1",
+      "type": "text",
+      "props": {
+        "content": "<p>This page is built with blocks. Add more blocks from Studio → Builder.</p>",
+        "align": "center"
+      }
+    },
+    {
+      "id": "cta-1",
+      "type": "cta",
+      "props": {
+        "heading": "Ready to build?",
+        "text": "Open Studio and start adding blocks.",
+        "primaryText": "Open Studio",
+        "primaryLink": "/studio/builder/home"
+      }
+    }
+  ]
+}

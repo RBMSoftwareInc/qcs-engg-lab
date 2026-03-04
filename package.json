@@ -4,7 +4,7 @@
 	"version": "0.0.1",
 	"type": "module",
 	"engines": {
-		"node": ">=20.19.0",
+		"node": ">=18.0.0",
 		"npm": ">=10.0.0"
 	},
 	"scripts": {
@@ -17,7 +17,9 @@
 		"sync-assets": "mkdir -p static/assets && cp -r assets/* static/assets/ 2>/dev/null || true",
 		"generate-redirects": "tsx scripts/generate-redirects.ts",
 		"content-triage": "tsx scripts/content-triage.ts",
-		"migrate-wp": "tsx scripts/migrate-wordpress.ts"
+		"migrate-wp": "tsx scripts/migrate-wordpress.ts",
+		"scheduled-publish": "tsx scripts/run-scheduled-publish.ts",
+		"mcp": "tsx scripts/mcp-server.ts"
 	},
 	"devDependencies": {
 		"@mdx-js/mdx": "^3.1.1",

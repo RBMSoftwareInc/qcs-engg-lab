@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { safeJsonParse } from '$lib/studio/api-utils';
 
@@ -9,6 +10,19 @@
 	let content = $state('');
 	let creating = $state(false);
 	let error = $state('');
+	let defaultStatus = $state<'draft' | 'live'>('draft');
+
+	onMount(async () => {
+		try {
+			const res = await fetch('/studio/api/studio-config');
+			const { data, isHtml } = await safeJsonParse<{ config?: { defaultNewContentStatus?: 'draft' | 'live' } }>(res);
+			if (!isHtml && data?.config?.defaultNewContentStatus) {
+				defaultStatus = data.config.defaultNewContentStatus;
+			}
+		} catch {
+			// keep draft
+		}
+	});
 
 	$effect(() => {
 		// Auto-generate slug from title
@@ -33,7 +47,7 @@
 			// Build frontmatter
 			const frontmatter = {
 				type: category === 'domains' ? 'domain' : category === 'services' ? 'service' : 'page',
-				status: 'draft',
+				status: defaultStatus,
 				title,
 				description: description || undefined,
 				order: undefined

@@ -73,15 +73,20 @@
 </svelte:head>
 
 <Section class="insights-hero">
-	<Reveal>
-		<h1>Insights</h1>
-		<p class="insights-intro">
-			Research insights, technical articles, and strategic thinking. Engineering observations that shape how we build systems.
-		</p>
-		<button class="newsletter-btn" onclick={() => (showNewsletter = true)}>
-			Subscribe to Newsletter
-		</button>
-	</Reveal>
+	<div class="insights-hero-inner">
+		<Reveal>
+			<h1>Insights</h1>
+			<p class="insights-intro">
+				Research insights, technical articles, and strategic thinking. Engineering observations that shape how we build systems.
+			</p>
+			<button class="newsletter-btn" onclick={() => (showNewsletter = true)}>
+				Subscribe to Newsletter
+			</button>
+		</Reveal>
+		<div class="insights-hero-image">
+			<img src="/assets/images/shared/insights-engg.svg" alt="" role="presentation" loading="lazy" />
+		</div>
+	</div>
 </Section>
 
 <Section class="insights-content">
@@ -125,6 +130,28 @@
 	.insights-hero {
 		text-align: center;
 		padding: 3rem 0 2rem;
+	}
+	.insights-hero-inner {
+		display: grid;
+		grid-template-columns: 1fr;
+		gap: 2rem;
+		align-items: center;
+		max-width: 900px;
+		margin: 0 auto;
+	}
+	@media (min-width: 768px) {
+		.insights-hero-inner {
+			grid-template-columns: 1fr auto;
+			text-align: left;
+		}
+	}
+	.insights-hero-image {
+		opacity: 0.7;
+	}
+	.insights-hero-image img {
+		max-width: 280px;
+		width: 100%;
+		height: auto;
 	}
 
 	.insights-intro {

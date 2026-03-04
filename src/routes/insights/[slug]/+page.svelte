@@ -6,12 +6,24 @@
 	import TTSReader from '$lib/components/TTSReader.svelte';
 	import TermTooltip from '$lib/components/TermTooltip.svelte';
 	import NewsletterModal from '$lib/components/NewsletterModal.svelte';
-	import { loadContentBySlug } from '$lib/content/loader';
+	import ReadingProgress from '$lib/components/ReadingProgress.svelte';
+	import OnThisPage from '$lib/components/OnThisPage.svelte';
+	import RelatedLinks from '$lib/components/RelatedLinks.svelte';
+	import { loadContentBySlug, loadContentByDirectory } from '$lib/content/loader';
 	import { page } from '$app/stores';
 	import { onMount } from 'svelte';
 
 	let slug = $derived($page.params.slug || '');
 	let content = $derived(loadContentBySlug(slug));
+	const allInsights = loadContentByDirectory('insights') || [];
+	let prevNext = $derived.by(() => {
+		const idx = allInsights.findIndex((a) => a.slug === slug);
+		if (idx < 0) return { prev: null, next: null };
+		return {
+			prev: idx > 0 ? { title: allInsights[idx - 1].metadata.title, href: `/insights/${allInsights[idx - 1].slug}` } : null,
+			next: idx < allInsights.length - 1 && idx >= 0 ? { title: allInsights[idx + 1].metadata.title, href: `/insights/${allInsights[idx + 1].slug}` } : null
+		};
+	});
 	let highlightedWord = $state('');
 	let highlightedIndex = $state(-1);
 	let showNewsletter = $state(false);
@@ -197,9 +209,24 @@
 			</Reveal>
 		</div>
 
+		<ReadingProgress readTimeMinutes={content.metadata.readTime || 0} contentSelector=".article-body" />
+
 		<Reveal delay={0.3}>
-			<div class="reading-content" class:highlighting={highlightedWord !== ''}>
-				<MarkdownBlock html={content.html} class="article-body" />
+			<div class="article-layout">
+				<div class="article-main">
+					<div class="reading-content" class:highlighting={highlightedWord !== ''}>
+						<MarkdownBlock html={content.html} class="article-body" />
+					</div>
+					<RelatedLinks
+						prev={prevNext.prev}
+						next={prevNext.next}
+						backHref="/insights"
+						backLabel="All Insights"
+					/>
+				</div>
+				<aside class="article-sidebar">
+					<OnThisPage selector=".article-main" headingTag="h2" />
+				</aside>
 			</div>
 		</Reveal>
 	{:else}
@@ -317,6 +344,26 @@
 		background: var(--bg-accent);
 		border-color: var(--highlight);
 		transform: translateY(-2px);
+	}
+
+	.article-layout {
+		display: grid;
+		grid-template-columns: 1fr;
+		gap: 3rem;
+	}
+
+	@media (min-width: 1024px) {
+		.article-layout {
+			grid-template-columns: 1fr 200px;
+		}
+
+		.article-sidebar {
+			order: 2;
+		}
+	}
+
+	.article-main {
+		min-width: 0;
 	}
 
 	.reading-content {

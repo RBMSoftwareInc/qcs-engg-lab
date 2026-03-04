@@ -1,0 +1,41 @@
+# Scheduled publish: flip draft content with publishAt <= now to status: live.
+# Runs every 15 minutes and on manual trigger. Requires content/ in repo (checkout).
+# The script commits via GitHub API; GITHUB_TOKEN is provided by Actions.
+
+name: Scheduled publish
+
+on:
+  schedule:
+    # Every 15 minutes
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read   # checkout
+  contents: write  # script pushes commits via GitHub API
+
+jobs:
+  scheduled-publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run scheduled publish
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_OWNER: ${{ github.repository_owner }}
+          GITHUB_REPO: ${{ github.event.repository.name }}
+          GITHUB_BRANCH: ${{ github.ref_name }}
+        run: npm run scheduled-publish

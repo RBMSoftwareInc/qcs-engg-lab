@@ -1,18 +1,22 @@
-// Configuration for Netlify deployment (supports server-side Studio)
-import adapter from '@sveltejs/adapter-netlify';
+// Configuration for Netlify (default) or static build (Hostinger)
+// Set BUILD_STATIC=1 for static-only output to build/ (e.g. Hostinger upload)
+import adapterNetlify from '@sveltejs/adapter-netlify';
+import adapterStatic from '@sveltejs/adapter-static';
 import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
+
+const useStatic = process.env.BUILD_STATIC === '1';
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
 	preprocess: vitePreprocess(),
 
 	kit: {
-		adapter: adapter({
-			// Netlify adapter automatically converts API routes to Netlify Functions
-			// This allows Studio to work fully on Netlify
-			edge: false, // Use Node.js runtime (not Edge Functions)
-			split: false // Single function for all routes
-		}),
+		adapter: useStatic
+			? adapterStatic({ strict: false }) // strict: false so API routes are skipped without failing
+			: adapterNetlify({
+					edge: false,
+					split: false
+				}),
 		prerender: {
 			handleHttpError: 'warn',
 			handleUnseenRoutes: 'warn',

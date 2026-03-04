@@ -1,0 +1,24 @@
+{
+  "header": [
+    { "label": "Practice", "href": "/practice", "enabled": true },
+    { "label": "Philosophy", "href": "/philosophy", "enabled": true },
+    { "label": "Insights", "href": "/insights", "enabled": true },
+    { "label": "Signals", "href": "/signals", "enabled": true },
+    { "label": "Neural", "href": "/playground", "enabled": true },
+    { "label": "Forge", "href": "/forge", "enabled": true },
+    { "label": "About", "href": "/about", "enabled": true }
+  ],
+  "footer": [
+    { "label": "Practice", "href": "/practice", "enabled": true },
+    { "label": "Philosophy", "href": "/philosophy", "enabled": true },
+    { "label": "Insights", "href": "/insights", "enabled": true },
+    { "label": "Signals", "href": "/signals", "enabled": true },
+    { "label": "Neural", "href": "/playground", "enabled": true },
+    { "label": "Forge", "href": "/forge", "enabled": true },
+    { "label": "About", "href": "/about", "enabled": true }
+  ],
+  "cta": [
+    { "id": "initiate", "label": "Initiate", "type": "modal", "enabled": true },
+    { "id": "contact", "label": "Contact", "type": "link", "href": "mailto:info@quantumcoresolutions.com", "enabled": false }
+  ]
+}
